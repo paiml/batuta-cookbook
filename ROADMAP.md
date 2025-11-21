@@ -384,38 +384,47 @@
 ### Level 400 - Expert
 
 #### RECIPE-400-1: End-to-End Microservice Migration
-**Status:** ⚪ Not Started
+**Status:** ✅ Completed
 **Priority:** P3
 **Phase:** Phase 3
 **Estimated:** 40 hours
 
-- [ ] Implement E2E migration
-- [ ] Write example code (examples/recipe_400_1_e2e_migration.rs)
-- [ ] Write integration tests
-- [ ] Add real-world example
-- [ ] Documentation
-- [ ] Verify example runs
+- [x] Implement E2E migration
+- [x] Write example code (examples/recipe_400_1_e2e_migration.rs)
+- [x] Write integration tests (15 tests)
+- [x] Add real-world example
+- [x] Documentation
+- [x] Verify example runs
+
+**Learning Objectives:**
+- Complete microservice migration workflows
+- Dependency analysis and service mapping
+- Phased migration strategies (strangler pattern)
+- Integration testing and smoke tests
+- Deployment automation and rollback
 
 ---
 
 #### RECIPE-400-2: Production Pipeline Integration
-**Status:** ⚪ Not Started
+**Status:** ✅ Completed
 **Priority:** P1 (Tracer Bullet - per Toyota Way review)
-**Phase:** Phase 2
+**Phase:** Phase 3
 **Estimated:** 36 hours
 
-- [ ] Implement CI/CD integration
-- [ ] Write example code (examples/recipe_400_2_pipeline.rs)
-- [ ] Write integration tests
-- [ ] Add GitHub Actions example
-- [ ] Documentation
-- [ ] Verify example runs
+- [x] Implement CI/CD integration
+- [x] Write example code (examples/recipe_400_2_production_pipeline.rs)
+- [x] Write integration tests (14 tests)
+- [x] Add GitHub Actions example
+- [x] Add GitLab CI, Jenkins, CircleCI examples
+- [x] Documentation
+- [x] Verify example runs
 
 **Learning Objectives:**
-- Integrate Batuta into CI/CD
+- Integrate Batuta into CI/CD (GitHub Actions, GitLab CI, Jenkins)
 - Automated transpilation pipeline
-- Quality gates integration
-- Production deployment strategies
+- Quality gates integration (coverage, mutation, complexity thresholds)
+- Production deployment strategies (blue-green, canary)
+- Multi-stage pipelines with validation
 
 ---
 
@@ -467,34 +476,34 @@
 
 ## Progress Summary
 
-**Overall Progress:** 15/20 recipes completed (75%) 🎉🎉
+**Overall Progress:** 17/20 recipes completed (85%) 🎉🎉🎉
 
 **By Level:**
 - Level 100 (Basic): 5/5 completed (100%) ✅✅✅✅✅
 - Level 200 (Intermediate): 5/5 completed (100%) ✅✅✅✅✅
 - Level 300 (Advanced): 5/5 completed (100%) ✅✅✅✅✅
-- Level 400 (Expert): 0/5 completed (0%) ⚪⚪⚪⚪⚪
+- Level 400 (Expert): 2/5 completed (40%) ✅✅⚪⚪⚪
 
 **By Priority:**
 - P0 (Critical): 2/2 completed (100%) ✅✅
-- P1 (High): 4/4 completed (100%) ✅✅✅✅
+- P1 (High): 5/5 completed (100%) ✅✅✅✅✅
 - P2 (Medium): 6/9 completed (67%) ✅✅✅✅✅✅⚪⚪⚪
-- P3 (Low): 2/5 completed (40%) ✅✅⚪⚪⚪
+- P3 (Low): 3/6 completed (50%) ✅✅✅⚪⚪⚪
 
 **Total Estimated Hours:** 800 hours
-**Completed Hours:** 258 hours (32%)
-**Remaining Hours:** 542 hours
+**Completed Hours:** 334 hours (42%)
+**Remaining Hours:** 466 hours
 
 ---
 
 ## Quality Metrics
 
 **Current Status:**
-- Total Tests: 196 passing (17 lib + 179 examples) 🎉
+- Total Tests: 225 passing (17 lib + 208 examples) 🎉 **TARGET EXCEEDED!**
 - Test Coverage: TBD (tooling ready)
 - Mutation Score: TBD (tooling ready)
 - TDG Score: TBD
-- All Examples Runnable: 15/15 (100%) ✅
+- All Examples Runnable: 17/17 (100%) ✅
 
 **Target Status:**
 - Total Tests: >200
