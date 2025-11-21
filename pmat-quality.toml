@@ -1,0 +1,241 @@
+# PMAT Quality Configuration for Batuta Cookbook
+# Extreme TDD Standard - Higher thresholds than typical projects
+
+[complexity]
+# Strict complexity thresholds for cookbook examples
+cyclomatic_threshold = 15       # Keep examples simple
+cognitive_threshold = 17        # Easy to understand
+max_nesting_depth = 5           # Avoid deep nesting
+max_function_lines = 100        # Concise functions
+max_file_lines = 1000           # Manageable file sizes
+
+[entropy]
+# Code duplication detection
+enabled = true
+min_pattern_occurrences = 10    # Lower threshold to catch duplication early
+min_pattern_lines = 8           # Catch smaller duplications
+max_violations_to_report = 50
+pattern_similarity_threshold = 0.90
+ignore_test_files = false       # CHECK test files too (examples are like tests)
+ignore_generated_files = true
+ignore_patterns = [
+    "*/target/*",
+    "*/examples/data/*",        # Test fixtures
+    "*/.git/*",
+    "*.proptest-regressions",
+    "*/benches/target/*",
+]
+
+[satd]
+# Self-Admitted Technical Debt - Zero tolerance for cookbook
+enabled = true
+zero_tolerance = true           # EXTREME: No TODOs in cookbook
+patterns = [
+    "TODO",
+    "FIXME",
+    "HACK",
+    "XXX",
+    "REFACTOR",
+    "OPTIMIZE",
+    "BUG",
+    "DEPRECATED"
+]
+# Exception: Allow in comments explaining what NOT to do
+exception_patterns = [
+    "// ❌ BAD",
+    "// DON'T",
+    "// WRONG",
+]
+
+[dead_code]
+# Detect unused code in cookbook
+enabled = true
+ignore_test_functions = false   # Check everything
+ignore_cfg_test = false          # Check test modules too
+threshold_percentage = 0.5       # Flag if more than 0.5% dead code
+strict_mode = true
+
+[coverage]
+# EXTREME TDD: >90% coverage requirement
+minimum_coverage = 90.0          # EXTREME: 90% minimum
+preferred_coverage = 95.0        # TARGET: 95% preferred
+enforce_on_new_code = true
+ignore_test_files = false        # Measure coverage of example code
+ignore_patterns = [
+    "examples/data/*",
+    "target/*",
+]
+
+# Coverage by recipe level
+[coverage.by_level]
+level_100 = 95.0  # Basic recipes: 95%
+level_200 = 92.0  # Intermediate: 92%
+level_300 = 90.0  # Advanced: 90%
+level_400 = 85.0  # Expert: 85% (complex, lower threshold)
+
+[mutation_testing]
+# EXTREME: Mutation testing to validate test quality
+enabled = true
+minimum_kill_rate = 80.0         # EXTREME: 80% mutation kill rate
+timeout_multiplier = 3
+test_timeout_seconds = 300
+exclude_patterns = [
+    "tests/fixtures/*",
+    "examples/data/*",
+    "benches/*",
+]
+mutation_operators = [
+    "replace_binary_operator",
+    "replace_return_value",
+    "delete_statement",
+    "negate_condition",
+]
+
+[documentation]
+# Documentation requirements for cookbook
+minimum_doc_coverage = 85.0      # 85% of public items documented
+require_examples = true          # Every public function needs example
+require_safety_docs = true       # Document unsafe code
+require_error_docs = true        # Document errors
+require_panics_docs = true       # Document panics
+
+# Cookbook-specific requirements
+require_recipe_metadata = true   # Every recipe needs metadata
+require_learning_objectives = true
+require_prerequisites = true
+require_runnable_code = true     # NO PSEUDO-CODE
+
+[security]
+# Security scanning for cookbook
+enabled = true
+scan_dependencies = true
+check_unsafe_code = true
+max_unsafe_blocks = 0            # EXTREME: Zero unsafe in examples (all in batuta lib)
+check_panic_usage = true
+allow_unwrap_in_examples = true  # Examples can use .unwrap() for clarity
+
+[linting]
+# Clippy linting configuration
+enabled = true
+deny_warnings = true             # Treat warnings as errors
+clippy_args = [
+    "-D", "warnings",
+    "-D", "clippy::all",
+    "-D", "clippy::correctness",
+    "-D", "clippy::suspicious",
+    "-W", "clippy::complexity",
+    "-W", "clippy::perf",
+    "-W", "clippy::style",
+    "-W", "clippy::pedantic",
+]
+
+# Allow certain lints in examples
+allow_in_examples = [
+    "clippy::print_stdout",      # Examples should print output
+    "clippy::unwrap_used",       # Examples can unwrap for clarity
+    "clippy::expect_used",       # Examples can use expect
+]
+
+[formatting]
+# Code formatting requirements
+enabled = true
+enforce_rustfmt = true
+rustfmt_edition = "2021"
+check_mode = true                # Verify formatting without modifying
+
+[quality_gate]
+# Overall quality gate configuration
+fail_on_any_violation = true    # EXTREME: Any violation fails the gate
+aggregate_scoring = true
+stop_on_first_failure = false   # Show all issues, not just first
+
+# Weights for aggregate scoring
+weights = {
+    complexity = 0.15,
+    entropy = 0.10,
+    satd = 0.15,
+    dead_code = 0.10,
+    coverage = 0.25,           # HEAVY weight on coverage
+    mutation = 0.15,           # HEAVY weight on mutation testing
+    documentation = 0.10,
+}
+
+# Grade thresholds (cookbook targets A+)
+[grades]
+a_plus = 95    # TARGET: A+ grade (92+ in spec)
+a = 90
+a_minus = 85
+b_plus = 80
+b = 75
+b_minus = 70
+c_plus = 65
+c = 60
+d = 50
+f = 0
+
+[benchmarking]
+# Performance benchmarking requirements
+enabled = true
+require_for_optimization_recipes = true  # Level 300-400 recipes claiming speedups
+criterion_config = true
+measure_baseline = true
+track_regressions = true
+
+[examples]
+# Example validation (cookbook-specific)
+validate_compilation = true
+validate_execution = true
+validate_output = true
+require_tests = true
+require_metadata = true
+timeout_seconds = 60            # Each example must complete in 60s
+
+[recipe_validation]
+# Validate recipe structure (cookbook-specific)
+validate_metadata = true
+validate_learning_objectives = true
+validate_prerequisites = true
+validate_related_papers = true
+require_paper_annotations = true
+min_examples_per_recipe = 3      # At least 3 examples per recipe
+max_recipe_complexity = 15       # Recipes should be simple
+
+[paper_tracking]
+# Track peer-reviewed papers (cookbook-specific)
+require_citations = true
+require_arxiv_or_doi = true
+require_relevance_annotation = true
+require_code_examples = true
+min_papers_per_category = 2      # At least 2 papers per recipe category
+
+[tdg_scoring]
+# Technical Debt Grade scoring (Batuta integration)
+enabled = true
+target_score = 92.0              # A+ grade (as per spec)
+minimum_score = 90.0
+calculate_on_commit = true
+track_history = true
+
+[reporting]
+# Quality reporting configuration
+generate_html = true
+generate_json = true
+generate_markdown = true
+generate_summary = true
+output_directory = "./target/pmat-reports"
+
+# Report sections
+include_coverage_details = true
+include_mutation_details = true
+include_complexity_breakdown = true
+include_recipe_status = true
+include_paper_references = true
+
+[ci_optimization]
+# CI/CD performance optimization
+enable_caching = true
+parallel_testing = true
+incremental_compilation = true
+cache_dependencies = true
+cache_coverage = true
+max_parallel_jobs = 4

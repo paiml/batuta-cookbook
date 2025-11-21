@@ -1,0 +1,93 @@
+[package]
+name = "batuta-cookbook"
+version = "0.1.0"
+edition = "2021"
+authors = ["Pragmatic AI Labs <team@paiml.com>"]
+license = "MIT"
+description = "EXTREME TDD Cookbook for Batuta orchestration - Real, runnable recipes"
+homepage = "https://github.com/paiml/batuta-cookbook"
+repository = "https://github.com/paiml/batuta-cookbook"
+documentation = "https://paiml.github.io/batuta-cookbook/"
+readme = "README.md"
+keywords = ["batuta", "transpilation", "cookbook", "tdd", "orchestration"]
+categories = ["development-tools", "code-quality"]
+
+[lib]
+name = "batuta_cookbook"
+path = "src/lib.rs"
+
+[dependencies]
+# Core dependencies (when implementing Batuta integration)
+# batuta = { path = "../batuta" }  # Uncomment when batuta lib is ready
+
+# Utilities
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Testing utilities (also used in examples)
+proptest = { version = "1.4", optional = true }
+
+[dev-dependencies]
+# Testing
+proptest = "1.4"
+criterion = "0.5"
+approx = "0.5"
+
+# Coverage
+# Note: cargo-llvm-cov is a separate tool, not a dependency
+
+[features]
+default = []
+proptest = ["dep:proptest"]
+bench = []
+
+# Example-specific features
+examples_compile_only = []  # For CI: just verify examples compile
+
+[[bench]]
+name = "recipe_performance"
+harness = false
+required-features = ["bench"]
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.test]
+opt-level = 1  # Slightly optimize tests for faster execution
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[profile.bench]
+inherits = "release"
+debug = true  # Keep debug symbols for profiling
+
+# Linting configuration (matches specification)
+[lints.rust]
+unsafe_code = "warn"
+missing_docs = "allow"  # Examples can skip docs for clarity
+
+[lints.clippy]
+# Correctness
+correctness = { level = "deny", priority = -1 }
+suspicious = { level = "deny", priority = -1 }
+complexity = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
+style = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+# Allow certain lints in examples
+print_stdout = { level = "allow", priority = 10 }  # Examples should print
+unwrap_used = { level = "allow", priority = 10 }   # Examples can unwrap
+expect_used = { level = "allow", priority = 10 }   # Examples can expect
+
+# Package metadata for crates.io
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

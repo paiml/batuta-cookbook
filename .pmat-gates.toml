@@ -1,0 +1,170 @@
+# PMAT Quality Gate Configuration for Batuta Cookbook
+# Extreme TDD enforcement - All examples must be runnable
+
+[gates]
+# Clippy linter
+run_clippy = true
+clippy_strict = true              # -D warnings
+
+# Test suite
+run_tests = true
+test_timeout = 600                # 10 minutes for all tests
+test_all_features = true
+
+# Code coverage
+check_coverage = true
+min_coverage = 90.0               # EXTREME: 90% minimum
+coverage_tool = "llvm-cov"
+
+# Mutation testing
+run_mutation_tests = true
+mutation_timeout = 1800           # 30 minutes for mutation testing
+min_mutation_kill_rate = 80.0     # EXTREME: 80% kill rate
+
+# Complexity checks
+check_complexity = true
+max_cyclomatic_complexity = 15
+max_cognitive_complexity = 17
+
+# Examples validation (cookbook-specific)
+validate_examples_compile = true
+validate_examples_run = true
+example_timeout = 60              # Each example: 60 seconds
+
+# Benchmarks (for optimization recipes)
+check_benchmarks_compile = true
+run_benchmarks = false            # Don't run on every commit (too slow)
+
+# Documentation
+check_docs_build = true
+check_doc_coverage = true
+min_doc_coverage = 85.0
+
+# Security
+run_security_audit = true
+check_unsafe_code = true
+max_unsafe_blocks = 0             # EXTREME: Zero unsafe in cookbook examples
+
+# Formatting
+check_formatting = true
+auto_format = false               # Don't auto-format, just check
+
+# SATD (Self-Admitted Technical Debt)
+check_satd = true
+max_satd_comments = 0             # EXTREME: Zero TODOs
+
+# Dead code
+check_dead_code = true
+max_dead_code_percentage = 0.5
+
+# TDG (Technical Debt Grade)
+calculate_tdg = true
+min_tdg_score = 90.0              # A grade minimum
+
+[gate_stages]
+# Different gates for different stages
+
+# Pre-commit (fast checks)
+pre_commit = [
+    "format_check",
+    "clippy",
+    "test_quick",
+    "examples_compile",
+]
+
+# Pre-push (comprehensive checks)
+pre_push = [
+    "format_check",
+    "clippy_strict",
+    "test_all",
+    "coverage",
+    "examples_run",
+    "docs_build",
+]
+
+# Pre-release (exhaustive validation)
+pre_release = [
+    "format_check",
+    "clippy_strict",
+    "test_all",
+    "coverage_full",
+    "mutation_tests",
+    "examples_all",
+    "benchmarks_compile",
+    "docs_build",
+    "security_audit",
+    "tdg_score",
+    "roadmap_validate",
+]
+
+[thresholds]
+# Quality thresholds by recipe level
+[thresholds.level_100]
+min_coverage = 95.0
+max_complexity = 10
+min_tests = 5
+
+[thresholds.level_200]
+min_coverage = 92.0
+max_complexity = 12
+min_tests = 8
+
+[thresholds.level_300]
+min_coverage = 90.0
+max_complexity = 15
+min_tests = 10
+require_benchmarks = true
+
+[thresholds.level_400]
+min_coverage = 85.0
+max_complexity = 15
+min_tests = 12
+require_benchmarks = true
+
+[exemptions]
+# Files/patterns exempt from certain checks
+allow_unwrap_in = [
+    "examples/*.rs",              # Examples can use unwrap for clarity
+]
+allow_print_in = [
+    "examples/*.rs",              # Examples should print output
+]
+allow_expect_in = [
+    "examples/*.rs",
+]
+ignore_coverage_in = [
+    "examples/data/*",            # Test fixtures
+    "benches/*",                  # Benchmarks
+]
+
+[hooks]
+# Pre-commit hook configuration
+pre_commit_timeout = 300          # 5 minutes
+pre_push_timeout = 600            # 10 minutes
+enable_parallel = true
+cache_results = true
+
+[reporting]
+# Report generation
+report_format = "markdown"
+report_file = "./target/pmat-reports/quality-gate-report.md"
+verbose = true
+show_passed = true
+show_failed = true
+show_skipped = true
+
+[notifications]
+# Notification settings
+notify_on_failure = true
+notify_on_success = false
+notification_method = "stdout"
+
+[cookbook_specific]
+# Cookbook-specific validations
+validate_recipe_structure = true
+validate_paper_citations = true
+validate_runnable_examples = true
+require_learning_objectives = true
+require_prerequisites = true
+min_examples_per_recipe = 3
+require_tests_for_examples = true

@@ -1,0 +1,166 @@
+# PMAT Configuration for Batuta Cookbook
+# Extreme TDD Quality Standards - Every example MUST run
+
+[project]
+name = "batuta-cookbook"
+version = "1.0.0"
+quality_standard = "extreme_tdd"
+description = "Runnable TDD cookbook for Batuta orchestration"
+
+[quality_gate]
+# Extreme TDD thresholds - higher than standard
+max_cyclomatic_complexity = 15
+max_cognitive_complexity = 17
+max_satd_comments = 0           # Zero tolerance for technical debt
+min_test_coverage = 90.0        # EXTREME: 90% minimum (95% preferred)
+mutation_threshold = 80.0       # EXTREME: 80% mutation kill rate
+max_nesting_depth = 5
+max_function_lines = 100
+max_file_lines = 1000
+
+[documentation]
+required_updates = [
+    "docs/specifications/cookbook-recipes-book.md",
+    "README.md",
+    "CHANGELOG.md"
+]
+task_id_pattern = "RECIPE-[0-9]{3}-[0-9]"  # e.g., RECIPE-100-1, RECIPE-200-1
+minimum_doc_coverage = 85.0
+require_examples = true
+require_runnable_examples = true  # COOKBOOK-SPECIFIC: All examples must be runnable
+
+[toyota_way]
+# Applying Toyota Way principles from Batuta
+enable_muda_elimination = true      # No pseudo-code, only real examples
+enforce_jidoka_automation = true    # Built-in quality through CI
+kaizen_cycle_enforcement = true     # Continuous improvement of recipes
+enable_andon_alerts = true          # Stop the line on quality failures
+
+[recipe_management]
+# Cookbook-specific configuration
+current_phase = "phase_1_foundation"
+track_recipes_as_tickets = true
+enforce_runnable_examples = true
+auto_generate_roadmap = true
+
+[recipe_levels]
+# Coverage targets by recipe level
+level_100_target = 95.0  # Basic recipes must be exceptionally well tested
+level_200_target = 92.0  # Intermediate recipes
+level_300_target = 90.0  # Advanced recipes
+level_400_target = 85.0  # Expert recipes (more complex, may have lower coverage)
+
+[examples]
+# CRITICAL: Enforce that all examples are runnable
+require_cargo_run = true            # Every example must run via: cargo run --example name
+require_tests = true                # Every example must have #[cfg(test)] mod tests
+require_benchmarks_for_optimization = true  # Level 300-400 optimization recipes need benchmarks
+verify_compilation = true           # All examples must compile
+verify_execution = true             # All examples must execute without panicking
+
+[gates]
+# Pre-commit gates (fast checks)
+pre_commit = [
+    "fmt",              # Code formatting
+    "clippy",           # Linting
+    "test",             # Unit tests
+    "coverage_quick",   # Quick coverage check
+    "examples_compile", # Verify all examples compile
+]
+
+# Pre-push gates (comprehensive checks)
+pre_push = [
+    "test_all",         # All tests
+    "coverage_full",    # Full coverage report
+    "examples_run",     # Run all examples
+    "mutation",         # Mutation testing
+    "bench_compile",    # Benchmarks compile
+    "clippy_strict",    # Strict linting
+]
+
+# Pre-release gates (exhaustive validation)
+pre_release = [
+    "full_suite",       # Complete test suite
+    "coverage_report",  # Detailed coverage
+    "mutation_full",    # Complete mutation testing
+    "bench_run",        # Run all benchmarks
+    "tdg",              # TDG scoring
+    "roadmap_validate", # Roadmap consistency
+    "examples_all",     # All examples pass
+    "docs_build",       # Documentation builds
+    "security_audit",   # Security scan
+]
+
+[roadmap]
+auto_generate = true
+track_recipes = true
+enforce_examples = true
+yaml_path = "roadmap.yaml"
+update_on_commit = true
+
+[roadmap.tracking]
+# Track each recipe as a ticket
+recipe_prefix = "RECIPE"
+# Format: RECIPE-100-1, RECIPE-200-1, etc.
+# Level 100: Basic (1-5)
+# Level 200: Intermediate (1-5)
+# Level 300: Advanced (1-5)
+# Level 400: Expert (1-5)
+
+[roadmap.metadata]
+# Required metadata for each recipe ticket
+required_fields = [
+    "id",
+    "title",
+    "level",
+    "category",
+    "status",
+    "coverage",
+    "tests",
+    "examples",
+    "benchmarks",
+]
+
+[ci_integration]
+# CI/CD pipeline configuration
+platform = "github_actions"
+workflow_file = ".github/workflows/cookbook-quality.yml"
+fail_on_quality_gate = true
+parallel_execution = true
+cache_enabled = true
+
+[pmat_commands]
+# Common PMAT commands for cookbook development
+check = "cd ../paiml-mcp-agent-toolkit && cargo run -- check ../batuta-cookbook"
+health = "cd ../paiml-mcp-agent-toolkit && cargo run -- maintain health --project ../batuta-cookbook"
+roadmap = "cd ../paiml-mcp-agent-toolkit && cargo run -- maintain roadmap --project ../batuta-cookbook"
+validate = "cd ../paiml-mcp-agent-toolkit && cargo run -- maintain roadmap --validate --project ../batuta-cookbook"
+
+[pmat_integration]
+# Integration with PMAT toolkit
+pmat_path = "../paiml-mcp-agent-toolkit"
+enable_deterministic_tracking = true
+default_granularity = "recipe"  # Track at recipe level
+default_seed = 42
+
+[hooks]
+# Git hooks configuration
+enable_pre_commit = true
+enable_pre_push = true
+enable_commit_msg = true
+hook_timeout = 300  # 5 minutes for pre-commit
+push_timeout = 600  # 10 minutes for pre-push
+
+[reporting]
+# Quality reporting
+generate_html_report = true
+generate_json_report = true
+generate_markdown_report = true
+report_directory = "./target/pmat-reports"
+
+[notifications]
+# Alert on quality gate failures
+enable_alerts = true
+alert_on_coverage_drop = true
+alert_on_mutation_drop = true
+alert_on_tdg_drop = true

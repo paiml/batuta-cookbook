@@ -1,0 +1,101 @@
+# bashrs configuration for batuta-cookbook
+# Enforces shell script quality standards
+
+[quality]
+# Minimum quality score for scripts (0-10)
+min_score = 7.0
+
+# Quality grade requirements
+min_grade = "B"  # B or better (7.0+)
+
+[validation]
+# ShellCheck validation level
+level = "strict"  # none, minimal, strict, paranoid
+
+# Enable specific ShellCheck codes
+enable = [
+    "SC2046",  # Quote to prevent word splitting
+    "SC2086",  # Double quote to prevent globbing
+    "SC2164",  # Use 'cd ... || exit' in case cd fails
+    "SC2181",  # Check exit code directly with e.g. 'if mycmd;'
+]
+
+# Disable overly strict checks for hooks
+disable = [
+    "SC2032",  # Variable assigned in script (hooks are executables)
+    "SC2031",  # Subshell assignment (we fixed this)
+]
+
+[targets]
+# Target shell dialects
+default = "bash"  # bash, posix, dash, ash
+
+# Bash version requirement
+min_bash_version = "4.0"
+
+[linting]
+# Enable all safety checks
+enable_safety = true
+
+# Check for common pitfalls
+check_set_options = true  # set -e, set -u, set -o pipefail
+check_quotes = true       # Quote variable expansions
+check_arrays = true       # Proper array usage
+
+[purification]
+# Determinism enforcement
+enforce_determinism = true
+
+# Idempotency checks
+enforce_idempotency = false  # Not all scripts need to be idempotent
+
+# Safety transformations
+add_error_handling = true
+add_input_validation = true
+
+[testing]
+# Test requirements
+require_tests = false  # Optional for hooks
+min_coverage = 50.0   # If tests exist
+
+[formatting]
+# Shell script formatting
+indent_size = 2
+max_line_length = 100
+use_shellcheck_format = true
+
+[ci]
+# CI/CD integration
+fail_on_warnings = false  # Too strict for pre-commit
+fail_on_errors = true
+generate_report = true
+report_format = "markdown"
+
+[hooks]
+# Git hook specific settings
+allow_colors = true
+allow_user_interaction = false  # Hooks should be non-interactive
+timeout_seconds = 300          # 5 minute timeout
+
+[makefile]
+# Makefile analysis settings
+validate_targets = true
+check_phony = true
+enforce_comments = true
+max_complexity = 15
+
+[files]
+# Files to check
+include = [
+    ".git/hooks/*",
+    "**/*.sh",
+    "**/*.bash",
+    "**/Makefile",
+    "**/*.mk",
+]
+
+exclude = [
+    "target/**",
+    ".git/**",
+    "node_modules/**",
+]

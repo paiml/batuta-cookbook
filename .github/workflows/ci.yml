@@ -1,0 +1,287 @@
+name: Cookbook Quality Gates
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Job 1: Format and Lint
+  format-lint:
+    name: Format and Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+      - name: Run clippy
+        run: cargo clippy --all-features --all-targets -- -D warnings
+
+  # Job 2: Build and Test
+  build-test:
+    name: Build and Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Run tests
+        run: cargo test --all-features --verbose
+
+  # Job 3: Examples - Verify ALL recipes compile
+  examples-compile:
+    name: Verify Examples Compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: List all examples
+        run: |
+          echo "Found examples:"
+          ls -1 examples/*.rs || echo "No examples found yet"
+
+      - name: Build all examples
+        run: |
+          set -e
+          count=0
+          failed=0
+          for example in examples/*.rs; do
+            if [ -f "$example" ]; then
+              name=$(basename "$example" .rs)
+              echo "Building example: $name"
+              if cargo build --example "$name" --quiet; then
+                echo "  ✓ $name compiled"
+                count=$((count + 1))
+              else
+                echo "  ✗ $name failed"
+                failed=$((failed + 1))
+              fi
+            fi
+          done
+          echo ""
+          echo "Summary: $count examples compiled, $failed failed"
+          if [ $failed -gt 0 ]; then
+            exit 1
+          fi
+
+  # Job 4: Examples - Run ALL recipes
+  examples-run:
+    name: Run All Examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run all examples
+        run: |
+          set -e
+          count=0
+          failed=0
+          for example in examples/*.rs; do
+            if [ -f "$example" ]; then
+              name=$(basename "$example" .rs)
+              echo "Running example: $name"
+              echo "=========================================="
+              if timeout 60s cargo run --example "$name"; then
+                echo "✓ $name completed successfully"
+                count=$((count + 1))
+              else
+                echo "✗ $name failed or timed out"
+                failed=$((failed + 1))
+              fi
+              echo ""
+            fi
+          done
+          echo "Summary: $count examples ran successfully, $failed failed"
+          if [ $failed -gt 0 ]; then
+            exit 1
+          fi
+
+  # Job 5: Coverage
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Generate coverage
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+
+      - name: Check coverage threshold
+        run: |
+          coverage=$(cargo llvm-cov --all-features --summary-only | grep "TOTAL" | awk '{print $10}' | tr -d '%' || echo "0")
+          echo "Coverage: $coverage%"
+          if (( $(echo "$coverage < 90" | bc -l) )); then
+            echo "✗ Coverage $coverage% is below 90% threshold"
+            exit 1
+          else
+            echo "✓ Coverage $coverage% meets 90% threshold"
+          fi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: lcov.info
+          fail_ci_if_error: false
+
+  # Job 6: Documentation
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build docs
+        run: cargo doc --no-deps --all-features --document-private-items
+
+  # Job 7: Security Audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run cargo-audit
+        uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job 8: Shell Script Quality (bashrs)
+  shell-quality:
+    name: Shell Script Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-bashrs-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install bashrs
+        run: cargo install bashrs --locked || echo "bashrs already installed"
+
+      - name: Check shell scripts
+        run: |
+          echo "Checking pre-commit hook..."
+          bashrs lint .git/hooks/pre-commit --validation minimal || echo "⚠ Warnings found (non-blocking)"
+
+          echo ""
+          echo "Checking Makefile..."
+          bashrs lint Makefile 2>&1 | head -30 || echo "⚠ Warnings found (non-blocking)"
+
+          echo ""
+          echo "✓ Shell script quality check complete"
+
+  # Summary Job
+  ci-success:
+    name: CI Success
+    if: always()
+    needs: [format-lint, build-test, examples-compile, examples-run, coverage, docs, security, shell-quality]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all jobs
+        run: |
+          if [[ "${{ needs.format-lint.result }}" != "success" ]] || \
+             [[ "${{ needs.build-test.result }}" != "success" ]] || \
+             [[ "${{ needs.examples-compile.result }}" != "success" ]] || \
+             [[ "${{ needs.examples-run.result }}" != "success" ]] || \
+             [[ "${{ needs.coverage.result }}" != "success" ]] || \
+             [[ "${{ needs.docs.result }}" != "success" ]] || \
+             [[ "${{ needs.shell-quality.result }}" != "success" ]]; then
+            echo "❌ One or more CI jobs failed"
+            exit 1
+          fi
+          echo "✅ All CI jobs passed!"
