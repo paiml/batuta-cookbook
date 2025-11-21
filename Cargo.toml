@@ -26,6 +26,7 @@ thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.9"
+chrono = "0.4"
 
 # Testing utilities (also used in examples)
 proptest = { version = "1.4", optional = true }
@@ -35,6 +36,7 @@ proptest = { version = "1.4", optional = true }
 proptest = "1.4"
 criterion = "0.5"
 approx = "0.5"
+tempfile = "3.8"
 
 # Coverage
 # Note: cargo-llvm-cov is a separate tool, not a dependency
