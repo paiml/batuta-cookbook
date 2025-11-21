@@ -25,6 +25,10 @@ pub enum Error {
     #[error("Validation failed: {0}")]
     ValidationError(String),
 
+    /// Analysis error
+    #[error("Analysis failed: {0}")]
+    Analysis(String),
+
     /// Generic error
     #[error("Error: {0}")]
     Other(String),
