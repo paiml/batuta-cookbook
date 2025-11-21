@@ -27,6 +27,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.9"
 chrono = "0.4"
+num_cpus = "1.16"
 
 # Testing utilities (also used in examples)
 proptest = { version = "1.4", optional = true }
