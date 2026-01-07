@@ -280,6 +280,7 @@ jobs:
              [[ "${{ needs.examples-run.result }}" != "success" ]] || \
              [[ "${{ needs.coverage.result }}" != "success" ]] || \
              [[ "${{ needs.docs.result }}" != "success" ]] || \
+             [[ "${{ needs.security.result }}" != "success" ]] || \
              [[ "${{ needs.shell-quality.result }}" != "success" ]]; then
             echo "❌ One or more CI jobs failed"
             exit 1

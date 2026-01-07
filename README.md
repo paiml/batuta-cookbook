@@ -1,11 +1,43 @@
+<div align="center">
+
 # Batuta Cookbook 🎵
 
-> **EXTREME TDD Cookbook**: Real, runnable recipes for code orchestration and transpilation
+**Version 0.1.0** | **Author: Pragmatic AI Labs** | **License: MIT**
+
+**Keywords:** Rust, Transpilation, Code Orchestration, TDD, EXTREME TDD, Batuta, PMAT
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](.github/workflows/ci.yml)
+[![Rust](https://img.shields.io/badge/rust-1.75+-orange.svg)](https://www.rust-lang.org)
 [![Coverage](https://img.shields.io/badge/coverage-90%25%20minimum-brightgreen)](docs/specifications/cookbook-recipes-book.md)
 [![TDD](https://img.shields.io/badge/TDD-EXTREME-red)](docs/specifications/cookbook-recipes-book.md)
 [![PMAT](https://img.shields.io/badge/PMAT-A%2B-purple)](pmat.toml)
+[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](.github/workflows/ci.yml)
+
+> **EXTREME TDD Cookbook**: Real, runnable recipes for code orchestration and transpilation
+
+</div>
+
+## Table of Contents
+
+- [Core Principle: ONLY RUNNABLE CODE](#-core-principle-only-runnable-code)
+- [What is Batuta?](#-what-is-batuta)
+- [Features](#-features)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [Usage Examples](#-usage-examples)
+- [Recipe Catalog](#-recipe-catalog)
+- [EXTREME TDD Quality Standards](#-extreme-tdd-quality-standards)
+- [Peer-Reviewed Research Foundation](#-peer-reviewed-research-foundation)
+- [Development Workflow](#-development-workflow)
+- [PMAT Integration](#-pmat-integration)
+- [Learning Path](#-learning-path)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Related Projects](#-related-projects)
+- [Project Status](#-project-status)
+- [Acknowledgments](#-acknowledgments)
 
 ## 🎯 Core Principle: ONLY RUNNABLE CODE
 
@@ -25,6 +57,52 @@ This cookbook contains **20 recipes** demonstrating code orchestration, transpil
 **Batuta** is an orchestration framework that converts ANY software project—regardless of source language or domain—into modern, first-principles Rust implementations. Think of it as a conductor's baton (batuta in Spanish) orchestrating multiple specialized tools.
 
 Learn more: [Batuta Repository](https://github.com/paiml/batuta)
+
+## ✨ Features
+
+- **20 Production-Ready Recipes**: Four difficulty levels (100-400) with complete implementations
+- **100% Runnable Code**: Every recipe compiles, runs, and passes tests - no pseudo-code
+- **Cross-Platform**: Full support for Linux, macOS, and Windows
+- **EXTREME TDD**: >90% test coverage, >80% mutation score on all examples
+- **Research-Backed**: Built on 10 peer-reviewed papers from top-tier venues
+- **Multi-Language Support**: Python, C, Shell, NumPy, scikit-learn transpilation
+- **GPU Acceleration**: SIMD and GPU optimization examples with Trueno
+- **Production Focus**: Real-world enterprise migration and deployment patterns
+
+## 📦 Installation
+
+### Prerequisites
+
+- **Rust 1.75 or later**: [Install Rust](https://www.rust-lang.org/tools/install)
+- **Git**: For cloning the repository
+- **Make**: For running build tasks (optional but recommended)
+
+### Clone and Build
+
+```bash
+# Clone the repository
+git clone https://github.com/paiml/batuta-cookbook.git
+cd batuta-cookbook
+
+# Build the project
+cargo build --release
+
+# Install development tools (optional)
+make install-tools
+```
+
+### Verify Installation
+
+```bash
+# Run a sample recipe
+cargo run --example recipe_100_1_basic_analysis
+
+# Run tests
+cargo test
+
+# Check code quality
+make quick
+```
 
 ## 🚀 Quick Start
 
@@ -46,6 +124,51 @@ make examples-run
 make pmat-check
 ```
 
+## 💡 Usage Examples
+
+### Basic Project Analysis
+
+```rust
+use batuta_cookbook::Analyzer;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Analyze a Python project
+    let analyzer = Analyzer::new("./my_python_project");
+    let report = analyzer.analyze()?;
+
+    println!("Primary language: {}", report.primary_language);
+    println!("Total files: {}", report.file_count);
+    println!("Lines of code: {}", report.total_lines);
+
+    Ok(())
+}
+```
+
+### Running Recipes
+
+```bash
+# Run any recipe by number
+cargo run --example recipe_100_1_basic_analysis
+
+# Test a recipe
+cargo test recipe_100_1
+
+# Benchmark a recipe (Level 300+)
+cargo bench recipe_300_5
+```
+
+### Custom Workflows
+
+```bash
+# Run multiple recipes in sequence
+for i in {1..5}; do
+  cargo run --example recipe_100_${i}*
+done
+
+# Run with custom data
+DATA_PATH=./my_project cargo run --example recipe_200_1
+```
+
 ## 📖 Recipe Catalog
 
 ### Level 100: Basic Recipes (Beginners)
@@ -55,7 +178,7 @@ Learn fundamental Batuta operations:
 - **[Recipe 100-1](examples/recipe_100_1_basic_analysis.rs)**: Basic Project Analysis
 - **[Recipe 100-2](examples/recipe_100_2_tdg_score.rs)**: Calculate Technical Debt Grade
 - **[Recipe 100-3](examples/recipe_100_3_dependency_detection.rs)**: Detect Dependency Managers
-- **[Recipe 100-4](examples/recipe_100_4_generate_report.rs)**: Generate Analysis Report
+- **[Recipe 100-4](examples/recipe_100_4_analysis_report.rs)**: Generate Analysis Report
 - **[Recipe 100-5](examples/recipe_100_5_simple_transpilation.rs)**: Simple File Transpilation
 
 **Coverage Target:** 95% | **Prerequisites:** Basic Rust knowledge
@@ -64,11 +187,11 @@ Learn fundamental Batuta operations:
 
 Master transpilation and conversion:
 
-- **[Recipe 200-1](examples/recipe_200_1_python_project_transpilation.rs)**: Python to Rust Project
-- **[Recipe 200-2](examples/recipe_200_2_c_library_transpilation.rs)**: C Library to Safe Rust
-- **[Recipe 200-3](examples/recipe_200_3_numpy_to_trueno.rs)**: NumPy to Trueno SIMD/GPU
-- **[Recipe 200-4](examples/recipe_200_4_shell_to_rust.rs)**: Shell Scripts to Rust CLI
-- **[Recipe 200-5](examples/recipe_200_5_custom_rules.rs)**: Custom Transpilation Rules
+- **[Recipe 200-1](examples/recipe_200_1_multi_language.rs)**: Multi-Language Transpilation
+- **[Recipe 200-2](examples/recipe_200_2_incremental_transpilation.rs)**: Incremental Transpilation
+- **[Recipe 200-3](examples/recipe_200_3_custom_validation.rs)**: Custom Validation Rules
+- **[Recipe 200-4](examples/recipe_200_4_optimization_profiles.rs)**: Optimization Profiles
+- **[Recipe 200-5](examples/recipe_200_5_batch_processing.rs)**: Batch Processing
 
 **Coverage Target:** 92% | **Prerequisites:** Level 100 completed
 
@@ -76,10 +199,10 @@ Master transpilation and conversion:
 
 Optimize and validate:
 
-- **[Recipe 300-1](examples/recipe_300_1_ml_pipeline_gpu.rs)**: ML Pipeline GPU Acceleration
-- **[Recipe 300-2](examples/recipe_300_2_validation_renacer.rs)**: System Validation with Renacer
-- **[Recipe 300-3](examples/recipe_300_3_sklearn_to_aprender.rs)**: scikit-learn to Aprender
-- **[Recipe 300-4](examples/recipe_300_4_wasm_deployment.rs)**: Cross-Platform WASM Deploy
+- **[Recipe 300-1](examples/recipe_300_1_gpu_accelerated.rs)**: GPU-Accelerated Operations
+- **[Recipe 300-2](examples/recipe_300_2_ast_manipulation.rs)**: AST Manipulation
+- **[Recipe 300-3](examples/recipe_300_3_semantic_transformations.rs)**: Semantic Transformations
+- **[Recipe 300-4](examples/recipe_300_4_custom_codegen.rs)**: Custom Code Generation
 - **[Recipe 300-5](examples/recipe_300_5_performance_profiling.rs)**: Performance Profiling
 
 **Coverage Target:** 90% | **Prerequisites:** Level 200 completed
@@ -88,11 +211,11 @@ Optimize and validate:
 
 Production migrations:
 
-- **[Recipe 400-1](examples/recipe_400_1_enterprise_migration.rs)**: Enterprise System Migration
-- **[Recipe 400-2](examples/recipe_400_2_custom_backend.rs)**: Custom Transpiler Backend
-- **[Recipe 400-3](examples/recipe_400_3_regression_testing.rs)**: Automated Regression Testing
-- **[Recipe 400-4](examples/recipe_400_4_production_monitoring.rs)**: Production Monitoring
-- **[Recipe 400-5](examples/recipe_400_5_multi_repo_migration.rs)**: Multi-Repo Migration
+- **[Recipe 400-1](examples/recipe_400_1_e2e_migration.rs)**: End-to-End Migration
+- **[Recipe 400-2](examples/recipe_400_2_production_pipeline.rs)**: Production Pipeline
+- **[Recipe 400-3](examples/recipe_400_3_custom_language.rs)**: Custom Language Support
+- **[Recipe 400-4](examples/recipe_400_4_distributed.rs)**: Distributed Processing
+- **[Recipe 400-5](examples/recipe_400_5_ml_optimize.rs)**: ML Optimization
 
 **Coverage Target:** 85% | **Prerequisites:** Level 300 completed
 
@@ -238,13 +361,65 @@ Configuration files:
 
 **Total:** ~340 hours (8-10 weeks at 40 hours/week)
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Recipe Fails to Compile
+
+```bash
+# Clean and rebuild
+cargo clean
+cargo build --release
+
+# Check Rust version (must be 1.75+)
+rustc --version
+```
+
+#### Example Crashes or Panics
+
+- Ensure all data directories exist: `examples/data/`
+- Check file permissions on example data
+- Verify dependencies are installed: `cargo update`
+
+#### Tests Fail
+
+```bash
+# Run tests with verbose output
+cargo test -- --nocapture
+
+# Run a specific test
+cargo test recipe_100_1 -- --nocapture
+```
+
+#### Coverage Check Fails
+
+```bash
+# Install llvm-tools
+rustup component add llvm-tools-preview
+
+# Install cargo-llvm-cov
+cargo install cargo-llvm-cov
+```
+
+#### Performance Issues
+
+- Use release mode: `cargo run --release --example recipe_name`
+- Check system resources (RAM, CPU)
+- Review profiling guide in Recipe 300-5
+
+### Getting Help
+
+- **Issues**: [GitHub Issues](https://github.com/paiml/batuta-cookbook/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/paiml/batuta-cookbook/discussions)
+- **Discord**: [Pragmatic AI Labs Community](https://discord.gg/pragmatic-ai-labs)
+
 ## 🤝 Contributing
 
 We welcome contributions! Please read:
 
 1. [Contribution Guide](CONTRIBUTING.md)
-2. [Testing Guide](docs/guides/testing-guide.md)
-3. [Recipe Specification](docs/specifications/cookbook-recipes-book.md)
+2. [Recipe Specification](docs/specifications/cookbook-recipes-book.md)
 
 ### Contribution Checklist
 
@@ -266,12 +441,33 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🔗 Related Projects
 
-- [Batuta](https://github.com/paiml/batuta) - Orchestration framework
-- [Decy](https://github.com/paiml/decy) - C→Rust transpiler
-- [Depyler](https://github.com/paiml/depyler) - Python→Rust transpiler
-- [Trueno](https://github.com/paiml/trueno) - Multi-target compute library
-- [PMAT](https://github.com/paiml/paiml-mcp-agent-toolkit) - Quality analysis toolkit
-- [Ruchy](https://github.com/paiml/ruchy) - Rust-oriented scripting language
+### Sovereign AI Stack (Pure Rust ML Infrastructure)
+
+| Component | Version | Description |
+|-----------|---------|-------------|
+| [batuta](https://crates.io/crates/batuta) | 0.4.5 | Orchestration framework |
+| [trueno](https://crates.io/crates/trueno) | 0.11 | SIMD/GPU compute (AVX2/AVX-512/NEON, wgpu) |
+| [aprender](https://crates.io/crates/aprender) | 0.24 | ML algorithms, .apr format |
+| [realizar](https://crates.io/crates/realizar) | 0.5 | Inference engine (GGUF/SafeTensors) |
+| [entrenar](https://crates.io/crates/entrenar) | 0.5 | Training (autograd, LoRA/QLoRA) |
+| [pacha](https://crates.io/crates/pacha) | 0.2 | Model registry with signatures |
+| [repartir](https://crates.io/crates/repartir) | 2.0 | Distributed compute |
+| [alimentar](https://crates.io/crates/alimentar) | 0.2 | Zero-copy Parquet/Arrow loading |
+| [renacer](https://crates.io/crates/renacer) | 0.9 | Syscall tracing |
+
+### Transpilers
+
+| Tool | Description |
+|------|-------------|
+| [bashrs](https://crates.io/crates/bashrs) | Shell→Rust transpiler (6.51) |
+| [depyler](https://github.com/paiml/depyler) | Python→Rust transpiler |
+| [decy](https://github.com/paiml/decy) | C→Rust transpiler |
+
+### Other Tools
+
+- [PMAT](https://crates.io/crates/pmat) - Quality analysis toolkit (2.213)
+- [trueno-viz](https://crates.io/crates/trueno-viz) - Terminal/PNG visualization
+- [presentar](https://crates.io/crates/presentar) - Terminal presentation framework
 
 ## 📈 Project Status
 
