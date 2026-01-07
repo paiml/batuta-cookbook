@@ -17,9 +17,6 @@ name = "batuta_cookbook"
 path = "src/lib.rs"
 
 [dependencies]
-# Core batuta orchestration framework
-batuta = { version = "0.4", optional = true }
-
 # Utilities
 anyhow = "1.0"
 thiserror = "1.0"
@@ -46,7 +43,6 @@ tempfile = "3.8"
 default = []
 proptest = ["dep:proptest"]
 bench = []
-batuta = ["dep:batuta"]  # Enable full batuta integration
 
 # Example-specific features
 examples_compile_only = []  # For CI: just verify examples compile
