@@ -325,12 +325,10 @@ impl CodeGenerator {
     }
 
     fn generate_rust_struct(&self, output: &mut String, spec: &StructSpec) -> Result<()> {
-        writeln!(output, "#[derive(Debug, Clone)]").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
-        writeln!(output, "pub struct {} {{", spec.name).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "#[derive(Debug, Clone)]")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(output, "pub struct {} {{", spec.name)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         for field in &spec.fields {
             if let Some(doc) = &field.doc_comment {
@@ -347,23 +345,20 @@ impl CodeGenerator {
             .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
         }
 
-        writeln!(output, "}}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "}}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         // Generate methods
         if !spec.methods.is_empty() {
-            writeln!(output, "\nimpl {} {{", spec.name).map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output, "\nimpl {} {{", spec.name)
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
             for method in &spec.methods {
                 self.generate_rust_method(output, method)?;
             }
 
-            writeln!(output, "}}").map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output, "}}")
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
         }
 
         Ok(())
@@ -371,9 +366,8 @@ impl CodeGenerator {
 
     fn generate_rust_method(&self, output: &mut String, spec: &FunctionSpec) -> Result<()> {
         if let Some(doc) = &spec.doc_comment {
-            writeln!(output, "    /// {}", doc).map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output, "    /// {}", doc)
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
         }
 
         let params: Vec<String> = spec
@@ -404,38 +398,32 @@ impl CodeGenerator {
         )
         .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "        {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
-        writeln!(output, "    }}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "        {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(output, "    }}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
 
     fn generate_python_class(&self, output: &mut String, spec: &StructSpec) -> Result<()> {
-        writeln!(output, "class {}:", spec.name).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "class {}:", spec.name)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         // __init__ method
-        writeln!(output, "    def __init__(self):").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "    def __init__(self):")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         for field in &spec.fields {
             let default = field.default_value.as_deref().unwrap_or("None");
-            writeln!(output, "        self.{} = {}", field.name, default).map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output, "        self.{} = {}", field.name, default)
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
         }
 
         // Methods
         for method in &spec.methods {
-            writeln!(output).map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output)
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
             self.generate_python_method(output, method)?;
         }
 
@@ -446,7 +434,13 @@ impl CodeGenerator {
         let params: Vec<String> = spec
             .params
             .iter()
-            .map(|p| format!("{}: {}", p.name, p.type_info.to_language_type(self.target_language)))
+            .map(|p| {
+                format!(
+                    "{}: {}",
+                    p.name,
+                    p.type_info.to_language_type(self.target_language)
+                )
+            })
             .collect();
 
         let return_annotation = spec
@@ -465,17 +459,15 @@ impl CodeGenerator {
         )
         .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "        {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "        {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
 
     fn generate_typescript_class(&self, output: &mut String, spec: &StructSpec) -> Result<()> {
-        writeln!(output, "class {} {{", spec.name).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "class {} {{", spec.name)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         // Fields
         for field in &spec.fields {
@@ -489,32 +481,27 @@ impl CodeGenerator {
         }
 
         // Constructor
-        writeln!(output, "\n    constructor() {{").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "\n    constructor() {{")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         for field in &spec.fields {
             let default = field.default_value.as_deref().unwrap_or("null");
-            writeln!(output, "        this.{} = {};", field.name, default).map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output, "        this.{} = {};", field.name, default)
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
         }
 
-        writeln!(output, "    }}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "    }}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         // Methods
         for method in &spec.methods {
-            writeln!(output).map_err(|e| {
-                batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-            })?;
+            writeln!(output)
+                .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
             self.generate_typescript_method(output, method)?;
         }
 
-        writeln!(output, "}}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "}}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
@@ -523,7 +510,13 @@ impl CodeGenerator {
         let params: Vec<String> = spec
             .params
             .iter()
-            .map(|p| format!("{}: {}", p.name, p.type_info.to_language_type(self.target_language)))
+            .map(|p| {
+                format!(
+                    "{}: {}",
+                    p.name,
+                    p.type_info.to_language_type(self.target_language)
+                )
+            })
             .collect();
 
         let return_type = spec
@@ -541,20 +534,17 @@ impl CodeGenerator {
         )
         .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "        {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
-        writeln!(output, "    }}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "        {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(output, "    }}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
 
     fn generate_go_struct(&self, output: &mut String, spec: &StructSpec) -> Result<()> {
-        writeln!(output, "type {} struct {{", spec.name).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "type {} struct {{", spec.name)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         for field in &spec.fields {
             // Capitalize first letter for exported fields
@@ -568,9 +558,8 @@ impl CodeGenerator {
             .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
         }
 
-        writeln!(output, "}}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "}}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
@@ -594,16 +583,19 @@ impl CodeGenerator {
             .map(|t| format!(" -> {}", t.to_language_type(self.target_language)))
             .unwrap_or_default();
 
-        writeln!(output, "pub fn {}({}){} {{", spec.name, params.join(", "), return_type).map_err(
-            |e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)),
-        )?;
+        writeln!(
+            output,
+            "pub fn {}({}){} {{",
+            spec.name,
+            params.join(", "),
+            return_type
+        )
+        .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "    {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
-        writeln!(output, "}}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "    {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(output, "}}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
@@ -612,7 +604,13 @@ impl CodeGenerator {
         let params: Vec<String> = spec
             .params
             .iter()
-            .map(|p| format!("{}: {}", p.name, p.type_info.to_language_type(self.target_language)))
+            .map(|p| {
+                format!(
+                    "{}: {}",
+                    p.name,
+                    p.type_info.to_language_type(self.target_language)
+                )
+            })
             .collect();
 
         let return_annotation = spec
@@ -621,25 +619,32 @@ impl CodeGenerator {
             .map(|t| format!(" -> {}", t.to_language_type(self.target_language)))
             .unwrap_or_default();
 
-        writeln!(output, "def {}({}){}:", spec.name, params.join(", "), return_annotation)
-            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(
+            output,
+            "def {}({}){}:",
+            spec.name,
+            params.join(", "),
+            return_annotation
+        )
+        .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "    {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "    {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
 
-    fn generate_typescript_function(
-        &self,
-        output: &mut String,
-        spec: &FunctionSpec,
-    ) -> Result<()> {
+    fn generate_typescript_function(&self, output: &mut String, spec: &FunctionSpec) -> Result<()> {
         let params: Vec<String> = spec
             .params
             .iter()
-            .map(|p| format!("{}: {}", p.name, p.type_info.to_language_type(self.target_language)))
+            .map(|p| {
+                format!(
+                    "{}: {}",
+                    p.name,
+                    p.type_info.to_language_type(self.target_language)
+                )
+            })
             .collect();
 
         let return_type = spec
@@ -657,12 +662,10 @@ impl CodeGenerator {
         )
         .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "    {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
-        writeln!(output, "}}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "    {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(output, "}}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
@@ -671,7 +674,13 @@ impl CodeGenerator {
         let params: Vec<String> = spec
             .params
             .iter()
-            .map(|p| format!("{} {}", p.name, p.type_info.to_language_type(self.target_language)))
+            .map(|p| {
+                format!(
+                    "{} {}",
+                    p.name,
+                    p.type_info.to_language_type(self.target_language)
+                )
+            })
             .collect();
 
         let return_type = spec
@@ -689,12 +698,10 @@ impl CodeGenerator {
         )
         .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
-        writeln!(output, "    {}", spec.body).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
-        writeln!(output, "}}").map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write: {}", e))
-        })?;
+        writeln!(output, "    {}", spec.body)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
+        writeln!(output, "}}")
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write: {}", e)))?;
 
         Ok(())
     }
@@ -721,7 +728,10 @@ pub fn example_1_multi_language_struct() -> Result<()> {
             FieldSpec::new("name".to_string(), TypeInfo::new("string".to_string()))
                 .with_doc("User's full name".to_string()),
         )
-        .with_field(FieldSpec::new("age".to_string(), TypeInfo::new("int".to_string())))
+        .with_field(FieldSpec::new(
+            "age".to_string(),
+            TypeInfo::new("int".to_string()),
+        ))
         .with_field(
             FieldSpec::new(
                 "email".to_string(),
@@ -831,7 +841,10 @@ mod tests {
     #[test]
     fn test_type_info_optional() {
         let type_info = TypeInfo::new("int".to_string()).optional();
-        assert_eq!(type_info.to_language_type(TargetLanguage::Rust), "Option<i64>");
+        assert_eq!(
+            type_info.to_language_type(TargetLanguage::Rust),
+            "Option<i64>"
+        );
         assert_eq!(
             type_info.to_language_type(TargetLanguage::TypeScript),
             "number | null"
@@ -841,8 +854,14 @@ mod tests {
     #[test]
     fn test_type_info_array() {
         let type_info = TypeInfo::new("string".to_string()).array();
-        assert_eq!(type_info.to_language_type(TargetLanguage::Rust), "Vec<String>");
-        assert_eq!(type_info.to_language_type(TargetLanguage::Python), "list[str]");
+        assert_eq!(
+            type_info.to_language_type(TargetLanguage::Rust),
+            "Vec<String>"
+        );
+        assert_eq!(
+            type_info.to_language_type(TargetLanguage::Python),
+            "list[str]"
+        );
         assert_eq!(
             type_info.to_language_type(TargetLanguage::TypeScript),
             "string[]"
@@ -893,8 +912,14 @@ mod tests {
     #[test]
     fn test_generate_rust_struct() {
         let spec = StructSpec::new("Point".to_string())
-            .with_field(FieldSpec::new("x".to_string(), TypeInfo::new("int".to_string())))
-            .with_field(FieldSpec::new("y".to_string(), TypeInfo::new("int".to_string())));
+            .with_field(FieldSpec::new(
+                "x".to_string(),
+                TypeInfo::new("int".to_string()),
+            ))
+            .with_field(FieldSpec::new(
+                "y".to_string(),
+                TypeInfo::new("int".to_string()),
+            ));
 
         let generator = CodeGenerator::new(TargetLanguage::Rust);
         let code = generator.generate_struct(&spec).unwrap();

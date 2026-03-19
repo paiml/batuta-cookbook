@@ -293,10 +293,14 @@ impl PipelineConfig {
 
         for stage in &self.stages {
             config.push_str(&format!("      - run:\n          name: {}\n", stage.name()));
-            config.push_str(&format!("          command: echo 'Running {}'\n", stage.name()));
+            config.push_str(&format!(
+                "          command: echo 'Running {}'\n",
+                stage.name()
+            ));
         }
 
-        config.push_str("\nworkflows:\n  version: 2\n  build_and_test:\n    jobs:\n      - build\n");
+        config
+            .push_str("\nworkflows:\n  version: 2\n  build_and_test:\n    jobs:\n      - build\n");
         config
     }
 }
@@ -389,10 +393,10 @@ impl PipelineExecutor {
 
     fn check_quality_gates(&self) -> bool {
         // Simulate quality gate checks
-        let test_coverage = 92.0;  // Good coverage
-        let mutation_score = 82.0;  // Good mutation score
-        let complexity = 8;  // Low complexity
-        let duplication = 2.5;  // Low duplication
+        let test_coverage = 92.0; // Good coverage
+        let mutation_score = 82.0; // Good mutation score
+        let complexity = 8; // Low complexity
+        let duplication = 2.5; // Low duplication
 
         test_coverage >= self.config.quality_gates.min_test_coverage
             && mutation_score >= self.config.quality_gates.min_mutation_score
@@ -414,9 +418,20 @@ pub struct PipelineReport {
 impl PipelineReport {
     pub fn print_summary(&self) {
         println!("=== Pipeline Report: {} ===", self.pipeline_name);
-        println!("Status: {}", if self.all_passed { "✓ PASSED" } else { "✗ FAILED" });
+        println!(
+            "Status: {}",
+            if self.all_passed {
+                "✓ PASSED"
+            } else {
+                "✗ FAILED"
+            }
+        );
         println!("Total Duration: {:?}", self.total_duration);
-        println!("Stages Completed: {}/{}", self.stages_completed, self.results.len());
+        println!(
+            "Stages Completed: {}/{}",
+            self.stages_completed,
+            self.results.len()
+        );
         println!("\nStage Results:");
 
         for result in &self.results {
@@ -437,11 +452,8 @@ impl PipelineReport {
 pub fn example_1_basic_ci_pipeline() -> Result<()> {
     println!("=== Example 1: Basic CI Pipeline ===\n");
 
-    let config = PipelineConfig::new(
-        "Basic CI".to_string(),
-        CiPlatform::GitHubActions,
-    )
-    .with_env("RUST_VERSION".to_string(), "1.75".to_string());
+    let config = PipelineConfig::new("Basic CI".to_string(), CiPlatform::GitHubActions)
+        .with_env("RUST_VERSION".to_string(), "1.75".to_string());
 
     println!("Generated GitHub Actions config:\n");
     println!("{}", config.generate_config());
@@ -460,14 +472,11 @@ pub fn example_1_basic_ci_pipeline() -> Result<()> {
 pub fn example_2_advanced_cd_pipeline() -> Result<()> {
     println!("\n=== Example 2: Advanced CD Pipeline with Quality Gates ===\n");
 
-    let config = PipelineConfig::new(
-        "Production CD".to_string(),
-        CiPlatform::GitLabCi,
-    )
-    .with_stage(PipelineStage::IntegrationTest)
-    .with_stage(PipelineStage::QualityGates)
-    .with_stage(PipelineStage::DeployStaging)
-    .with_quality_gates(QualityGates::strict());
+    let config = PipelineConfig::new("Production CD".to_string(), CiPlatform::GitLabCi)
+        .with_stage(PipelineStage::IntegrationTest)
+        .with_stage(PipelineStage::QualityGates)
+        .with_stage(PipelineStage::DeployStaging)
+        .with_quality_gates(QualityGates::strict());
 
     println!("Pipeline stages: {:?}", config.stages.len());
     println!("Quality gates: Strict mode");
@@ -487,18 +496,15 @@ pub fn example_2_advanced_cd_pipeline() -> Result<()> {
 pub fn example_3_full_production_pipeline() -> Result<()> {
     println!("\n=== Example 3: Full Production Pipeline ===\n");
 
-    let config = PipelineConfig::new(
-        "Full Production".to_string(),
-        CiPlatform::GitHubActions,
-    )
-    .with_stage(PipelineStage::IntegrationTest)
-    .with_stage(PipelineStage::QualityGates)
-    .with_stage(PipelineStage::DeployStaging)
-    .with_stage(PipelineStage::SmokeTest)
-    .with_stage(PipelineStage::DeployProduction)
-    .with_stage(PipelineStage::Validation)
-    .with_quality_gates(QualityGates::default())
-    .with_env("DEPLOY_ENV".to_string(), "production".to_string());
+    let config = PipelineConfig::new("Full Production".to_string(), CiPlatform::GitHubActions)
+        .with_stage(PipelineStage::IntegrationTest)
+        .with_stage(PipelineStage::QualityGates)
+        .with_stage(PipelineStage::DeployStaging)
+        .with_stage(PipelineStage::SmokeTest)
+        .with_stage(PipelineStage::DeployProduction)
+        .with_stage(PipelineStage::Validation)
+        .with_quality_gates(QualityGates::default())
+        .with_env("DEPLOY_ENV".to_string(), "production".to_string());
 
     println!("Full pipeline with {} stages", config.stages.len());
     println!();
@@ -537,10 +543,7 @@ mod tests {
 
     #[test]
     fn test_pipeline_config_creation() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        );
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions);
 
         assert_eq!(config.name, "Test");
         assert_eq!(config.platform, CiPlatform::GitHubActions);
@@ -549,32 +552,26 @@ mod tests {
 
     #[test]
     fn test_pipeline_with_stage() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        )
-        .with_stage(PipelineStage::IntegrationTest);
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions)
+            .with_stage(PipelineStage::IntegrationTest);
 
         assert!(config.stages.contains(&PipelineStage::IntegrationTest));
     }
 
     #[test]
     fn test_pipeline_with_env() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        )
-        .with_env("KEY".to_string(), "value".to_string());
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions)
+            .with_env("KEY".to_string(), "value".to_string());
 
-        assert_eq!(config.environment_variables.get("KEY"), Some(&"value".to_string()));
+        assert_eq!(
+            config.environment_variables.get("KEY"),
+            Some(&"value".to_string())
+        );
     }
 
     #[test]
     fn test_github_actions_generation() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        );
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions);
 
         let generated = config.generate_config();
         assert!(generated.contains("name: Test"));
@@ -583,10 +580,7 @@ mod tests {
 
     #[test]
     fn test_gitlab_ci_generation() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitLabCi,
-        );
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitLabCi);
 
         let generated = config.generate_config();
         assert!(generated.contains("stages:"));
@@ -594,10 +588,7 @@ mod tests {
 
     #[test]
     fn test_pipeline_executor_creation() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        );
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions);
 
         let executor = PipelineExecutor::new(config);
         assert_eq!(executor.results.len(), 0);
@@ -605,10 +596,7 @@ mod tests {
 
     #[test]
     fn test_pipeline_execution() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        );
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions);
 
         let mut executor = PipelineExecutor::new(config);
         let report = executor.execute().unwrap();
@@ -633,10 +621,7 @@ mod tests {
 
     #[test]
     fn test_pipeline_with_custom_timeout() {
-        let mut config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        );
+        let mut config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions);
         config.timeout_minutes = 60;
 
         assert_eq!(config.timeout_minutes, 60);
@@ -644,13 +629,10 @@ mod tests {
 
     #[test]
     fn test_multiple_stages() {
-        let config = PipelineConfig::new(
-            "Test".to_string(),
-            CiPlatform::GitHubActions,
-        )
-        .with_stage(PipelineStage::IntegrationTest)
-        .with_stage(PipelineStage::QualityGates)
-        .with_stage(PipelineStage::DeployStaging);
+        let config = PipelineConfig::new("Test".to_string(), CiPlatform::GitHubActions)
+            .with_stage(PipelineStage::IntegrationTest)
+            .with_stage(PipelineStage::QualityGates)
+            .with_stage(PipelineStage::DeployStaging);
 
         assert!(config.stages.len() >= 9); // Base + 3 added
     }

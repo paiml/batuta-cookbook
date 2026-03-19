@@ -190,7 +190,8 @@ impl GpuTranspiler {
         let fallback_time = total_duration - gpu_time;
 
         // Calculate speedup (estimate based on parallelism)
-        let sequential_time_estimate = total_duration.as_secs_f64() * self.config.compute_units as f64;
+        let sequential_time_estimate =
+            total_duration.as_secs_f64() * self.config.compute_units as f64;
         let speedup_ratio = sequential_time_estimate / total_duration.as_secs_f64();
 
         let throughput = if total_duration.as_secs_f64() > 0.0 {
@@ -275,7 +276,10 @@ impl GpuTranspiler {
             Ok(())
         } else {
             self.failed.fetch_add(1, Ordering::SeqCst);
-            Err(Error::Other(format!("Unsupported file type: {}", file.display())))
+            Err(Error::Other(format!(
+                "Unsupported file type: {}",
+                file.display()
+            )))
         }
     }
 
@@ -308,10 +312,7 @@ pub fn benchmark_acceleration(
         cpu_metrics = Some(cpu_transpiler.transpile_batch(files.clone())?);
     }
 
-    Ok((
-        gpu_metrics.unwrap(),
-        cpu_metrics.unwrap(),
-    ))
+    Ok((gpu_metrics.unwrap(), cpu_metrics.unwrap()))
 }
 
 //
@@ -400,8 +401,8 @@ pub fn example_3_performance_comparison() -> Result<()> {
     println!("  Throughput: {:.2} files/sec", cpu_metrics.throughput);
 
     println!("\nGPU vs CPU Comparison:");
-    let relative_speedup = cpu_metrics.total_duration.as_secs_f64()
-        / gpu_metrics.total_duration.as_secs_f64();
+    let relative_speedup =
+        cpu_metrics.total_duration.as_secs_f64() / gpu_metrics.total_duration.as_secs_f64();
     println!("  GPU is {:.2}x faster than CPU", relative_speedup);
 
     if gpu_metrics.is_acceptable(2.0) {
@@ -513,10 +514,7 @@ mod tests {
 
     #[test]
     fn test_gpu_mode_processing() {
-        let files = vec![
-            PathBuf::from("a.py"),
-            PathBuf::from("b.py"),
-        ];
+        let files = vec![PathBuf::from("a.py"), PathBuf::from("b.py")];
 
         let config = GpuConfig::gpu_optimized();
         let transpiler = GpuTranspiler::new(config);
@@ -530,10 +528,7 @@ mod tests {
 
     #[test]
     fn test_cpu_mode_processing() {
-        let files = vec![
-            PathBuf::from("x.py"),
-            PathBuf::from("y.py"),
-        ];
+        let files = vec![PathBuf::from("x.py"), PathBuf::from("y.py")];
 
         let config = GpuConfig::cpu_only();
         let transpiler = GpuTranspiler::new(config);

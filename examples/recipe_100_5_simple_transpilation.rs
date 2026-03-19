@@ -136,7 +136,9 @@ impl Transpiler {
 
         // Add common imports
         rust_code.push_str("// Auto-generated Rust code from Python\n");
-        rust_code.push_str("// Note: This is a simple transpilation and may require manual adjustments\n\n");
+        rust_code.push_str(
+            "// Note: This is a simple transpilation and may require manual adjustments\n\n",
+        );
 
         let mut i = 0;
         while i < lines.len() {
@@ -367,9 +369,8 @@ impl Transpiler {
 
     /// Transpile a file
     pub fn transpile_file(&self, input_path: &Path, output_path: &Path) -> Result<()> {
-        let python_code = fs::read_to_string(input_path).map_err(|e| {
-            Error::TranspilationError(format!("Failed to read input file: {}", e))
-        })?;
+        let python_code = fs::read_to_string(input_path)
+            .map_err(|e| Error::TranspilationError(format!("Failed to read input file: {}", e)))?;
 
         let rust_code = self.transpile(&python_code)?;
 
@@ -462,18 +463,16 @@ def double(x: int) -> int:
     return x * 2
 "#;
 
-    fs::write(&input_path, python_code).map_err(|e| {
-        Error::TranspilationError(format!("Failed to write temp file: {}", e))
-    })?;
+    fs::write(&input_path, python_code)
+        .map_err(|e| Error::TranspilationError(format!("Failed to write temp file: {}", e)))?;
 
     // Transpile
     let transpiler = Transpiler::new();
     transpiler.transpile_file(&input_path, &output_path)?;
 
     // Read and display result
-    let rust_code = fs::read_to_string(&output_path).map_err(|e| {
-        Error::TranspilationError(format!("Failed to read output file: {}", e))
-    })?;
+    let rust_code = fs::read_to_string(&output_path)
+        .map_err(|e| Error::TranspilationError(format!("Failed to read output file: {}", e)))?;
 
     println!("Input file: {}", input_path.display());
     println!("Output file: {}", output_path.display());
@@ -573,14 +572,8 @@ mod tests {
     fn test_transpile_boolean_literals() {
         let transpiler = Transpiler::new();
 
-        assert_eq!(
-            transpiler.transpile_expression("True").unwrap(),
-            "true"
-        );
-        assert_eq!(
-            transpiler.transpile_expression("False").unwrap(),
-            "false"
-        );
+        assert_eq!(transpiler.transpile_expression("True").unwrap(), "true");
+        assert_eq!(transpiler.transpile_expression("False").unwrap(), "false");
     }
 
     #[test]

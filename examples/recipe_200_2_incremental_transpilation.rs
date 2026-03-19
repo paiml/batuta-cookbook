@@ -165,7 +165,9 @@ impl TranspilationCache {
 
     /// Evict the oldest cache entry
     fn evict_oldest(&mut self) {
-        if let Some(oldest_path) = self.entries.iter()
+        if let Some(oldest_path) = self
+            .entries
+            .iter()
             .min_by_key(|(_, entry)| entry.timestamp)
             .map(|(path, _)| path.clone())
         {
@@ -471,7 +473,10 @@ def calculate(x, y):
     println!("\n📊 Metrics:");
     println!("  Cache hits: {}", transpiler.metrics().cache_hits);
     println!("  Cache misses: {}", transpiler.metrics().cache_misses);
-    println!("  Files transpiled: {}", transpiler.metrics().files_transpiled);
+    println!(
+        "  Files transpiled: {}",
+        transpiler.metrics().files_transpiled
+    );
 
     // Second transpilation (cache hit)
     println!("\n🔧 Second transpilation (using cache)...\n");
@@ -528,7 +533,10 @@ fn example_2_batch_processing() -> Result<()> {
     transpiler.transpile_batch(file_pairs.clone())?;
     transpiler.save_cache()?;
 
-    println!("  Files transpiled: {}", transpiler.metrics().files_transpiled);
+    println!(
+        "  Files transpiled: {}",
+        transpiler.metrics().files_transpiled
+    );
     println!("  Cache misses: {}", transpiler.metrics().cache_misses);
 
     // Second batch (all cache hits)
@@ -540,7 +548,10 @@ fn example_2_batch_processing() -> Result<()> {
     println!("  Files skipped: {}", transpiler.metrics().files_skipped);
     println!("  Cache hits: {}", transpiler.metrics().cache_hits);
     println!("  Hit rate: {:.1}%", transpiler.metrics().hit_rate());
-    println!("  Time saved: {:.1}%", transpiler.metrics().time_saved_percentage());
+    println!(
+        "  Time saved: {:.1}%",
+        transpiler.metrics().time_saved_percentage()
+    );
 
     // Cleanup
     let _ = fs::remove_file(cache_file);
@@ -576,7 +587,10 @@ fn example_3_cache_invalidation() -> Result<()> {
     transpiler.transpile_file(&source_file, &output_file)?;
     transpiler.save_cache()?;
 
-    println!("\n📊 Initial: {} cache misses", transpiler.metrics().cache_misses);
+    println!(
+        "\n📊 Initial: {} cache misses",
+        transpiler.metrics().cache_misses
+    );
 
     // Transpile again without changes (cache hit)
     println!("\n🔧 Transpiling unchanged file...\n");
@@ -584,7 +598,10 @@ fn example_3_cache_invalidation() -> Result<()> {
     transpiler.load_cache()?;
     transpiler.transpile_file(&source_file, &output_file)?;
 
-    println!("📊 Unchanged: {} cache hits", transpiler.metrics().cache_hits);
+    println!(
+        "📊 Unchanged: {} cache hits",
+        transpiler.metrics().cache_hits
+    );
 
     // Modify file (cache invalidation)
     println!("\n🔧 Modifying source file...\n");
@@ -594,7 +611,10 @@ fn example_3_cache_invalidation() -> Result<()> {
     transpiler.load_cache()?;
     transpiler.transpile_file(&source_file, &output_file)?;
 
-    println!("📊 Modified: {} cache misses (cache invalidated)", transpiler.metrics().cache_misses);
+    println!(
+        "📊 Modified: {} cache misses (cache invalidated)",
+        transpiler.metrics().cache_misses
+    );
 
     // Cleanup
     let _ = fs::remove_file(cache_file);
@@ -772,7 +792,9 @@ mod tests {
         // Load cache
         let loaded_cache = TranspilationCache::load_from_file(&cache_file).unwrap();
         assert_eq!(loaded_cache.len(), 1);
-        assert!(loaded_cache.get(&PathBuf::from("test.py"), "hash123").is_some());
+        assert!(loaded_cache
+            .get(&PathBuf::from("test.py"), "hash123")
+            .is_some());
     }
 
     #[test]
@@ -873,8 +895,14 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
 
         let files = vec![
-            (temp_dir.path().join("file1.py"), temp_dir.path().join("file1.rs")),
-            (temp_dir.path().join("file2.py"), temp_dir.path().join("file2.rs")),
+            (
+                temp_dir.path().join("file1.py"),
+                temp_dir.path().join("file1.rs"),
+            ),
+            (
+                temp_dir.path().join("file2.py"),
+                temp_dir.path().join("file2.rs"),
+            ),
         ];
 
         for (source, _) in &files {

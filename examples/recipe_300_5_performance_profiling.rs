@@ -217,7 +217,8 @@ impl<'a> TimedScope<'a> {
 impl<'a> Drop for TimedScope<'a> {
     fn drop(&mut self) {
         let elapsed = self.start.elapsed();
-        self.profiler.record(MetricType::ExecutionTime, elapsed.as_secs_f64() * 1000.0);
+        self.profiler
+            .record(MetricType::ExecutionTime, elapsed.as_secs_f64() * 1000.0);
     }
 }
 
@@ -318,8 +319,10 @@ impl PerformanceReport {
         // Analyze execution time
         if let Some(time_stats) = profiler_stats.get(&MetricType::ExecutionTime) {
             if time_stats.std_dev > time_stats.mean * 0.5 {
-                recommendations
-                    .push("High variance in execution time - investigate inconsistent performance".to_string());
+                recommendations.push(
+                    "High variance in execution time - investigate inconsistent performance"
+                        .to_string(),
+                );
             }
             if time_stats.percentile_99 > time_stats.mean * 3.0 {
                 recommendations.push(
@@ -362,9 +365,18 @@ impl PerformanceReport {
 
         if let Some(mem) = &self.memory_stats {
             println!("\nMemory Usage:");
-            println!("  Total Allocated: {:.2} MB", mem.total_allocated as f64 / 1_048_576.0);
-            println!("  Peak Usage: {:.2} MB", mem.peak_usage as f64 / 1_048_576.0);
-            println!("  Avg Allocation: {:.2} KB", mem.avg_allocation_size / 1024.0);
+            println!(
+                "  Total Allocated: {:.2} MB",
+                mem.total_allocated as f64 / 1_048_576.0
+            );
+            println!(
+                "  Peak Usage: {:.2} MB",
+                mem.peak_usage as f64 / 1_048_576.0
+            );
+            println!(
+                "  Avg Allocation: {:.2} KB",
+                mem.avg_allocation_size / 1024.0
+            );
         }
 
         if !self.recommendations.is_empty() {
@@ -451,16 +463,31 @@ pub fn example_2_memory_tracking() -> Result<()> {
     tracker.allocate(2 * 1024 * 1024); // 2 MB
 
     println!("After allocations:");
-    println!("  Current usage: {:.2} MB", tracker.current_usage() as f64 / 1_048_576.0);
-    println!("  Peak usage: {:.2} MB", tracker.peak_usage() as f64 / 1_048_576.0);
+    println!(
+        "  Current usage: {:.2} MB",
+        tracker.current_usage() as f64 / 1_048_576.0
+    );
+    println!(
+        "  Peak usage: {:.2} MB",
+        tracker.peak_usage() as f64 / 1_048_576.0
+    );
 
     // Deallocate
     tracker.deallocate(512 * 1024);
 
     println!("\nAfter deallocation:");
-    println!("  Current usage: {:.2} MB", tracker.current_usage() as f64 / 1_048_576.0);
-    println!("  Peak usage: {:.2} MB", tracker.peak_usage() as f64 / 1_048_576.0);
-    println!("  Avg allocation: {:.2} KB", tracker.avg_allocation_size() / 1024.0);
+    println!(
+        "  Current usage: {:.2} MB",
+        tracker.current_usage() as f64 / 1_048_576.0
+    );
+    println!(
+        "  Peak usage: {:.2} MB",
+        tracker.peak_usage() as f64 / 1_048_576.0
+    );
+    println!(
+        "  Avg allocation: {:.2} KB",
+        tracker.avg_allocation_size() / 1024.0
+    );
 
     Ok(())
 }

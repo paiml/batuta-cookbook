@@ -546,12 +546,15 @@ pub fn example_3_multi_service_migration() -> Result<()> {
                 dependency_type: DependencyType::Database,
                 required: true,
             }),
-        ServiceSpec::new("notification-worker".to_string(), ServiceType::MessageConsumer)
-            .with_dependency(ServiceDependency {
-                service_name: "rabbitmq".to_string(),
-                dependency_type: DependencyType::MessageQueue,
-                required: true,
-            }),
+        ServiceSpec::new(
+            "notification-worker".to_string(),
+            ServiceType::MessageConsumer,
+        )
+        .with_dependency(ServiceDependency {
+            service_name: "rabbitmq".to_string(),
+            dependency_type: DependencyType::MessageQueue,
+            required: true,
+        }),
     ];
 
     let mut executor = MigrationExecutor::new();
@@ -590,12 +593,13 @@ mod tests {
 
     #[test]
     fn test_service_with_dependencies() {
-        let service = ServiceSpec::new("test".to_string(), ServiceType::RestApi)
-            .with_dependency(ServiceDependency {
+        let service = ServiceSpec::new("test".to_string(), ServiceType::RestApi).with_dependency(
+            ServiceDependency {
                 service_name: "db".to_string(),
                 dependency_type: DependencyType::Database,
                 required: true,
-            });
+            },
+        );
 
         assert_eq!(service.dependencies.len(), 1);
     }
@@ -677,8 +681,7 @@ mod tests {
         let mut executor = MigrationExecutor::new();
 
         for i in 0..3 {
-            let service =
-                ServiceSpec::new(format!("service-{}", i), ServiceType::RestApi);
+            let service = ServiceSpec::new(format!("service-{}", i), ServiceType::RestApi);
             let plan = MigrationPlan::new(service);
             executor.add_plan(plan);
         }

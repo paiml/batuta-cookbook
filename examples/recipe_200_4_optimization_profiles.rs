@@ -344,8 +344,10 @@ impl ProfileBenchmarker {
     /// Print comparison table
     pub fn print_comparison(&self) {
         println!("Profile Comparison:");
-        println!("{:<15} {:>12} {:>15} {:>12} {:>10} {:>8}",
-                 "Profile", "Compile (ms)", "Ops/sec", "Memory (MB)", "Size (KB)", "Score");
+        println!(
+            "{:<15} {:>12} {:>15} {:>12} {:>10} {:>8}",
+            "Profile", "Compile (ms)", "Ops/sec", "Memory (MB)", "Size (KB)", "Score"
+        );
         println!("{}", "-".repeat(85));
 
         for result in &self.results {
@@ -398,7 +400,11 @@ impl ProfileSelector {
                 .iter()
                 .find(|p| p.name == "development")
                 .unwrap(),
-            UseCase::Production => self.profiles.iter().find(|p| p.name == "production").unwrap(),
+            UseCase::Production => self
+                .profiles
+                .iter()
+                .find(|p| p.name == "production")
+                .unwrap(),
             UseCase::Testing => self.profiles.iter().find(|p| p.name == "balanced").unwrap(),
             UseCase::Deployment => self.profiles.iter().find(|p| p.name == "size").unwrap(),
         }
@@ -482,8 +488,14 @@ fn example_2_profile_recommendations() -> Result<()> {
         println!("📋 Use Case: {}", name);
         println!("   Recommended Profile: {}", profile.name);
         println!("   Optimization Level: {}", profile.optimization_level);
-        println!("   Compile Time Factor: {:.2}x", profile.compilation_time_estimate());
-        println!("   Performance Gain: {:.2}x", profile.performance_improvement());
+        println!(
+            "   Compile Time Factor: {:.2}x",
+            profile.compilation_time_estimate()
+        );
+        println!(
+            "   Performance Gain: {:.2}x",
+            profile.performance_improvement()
+        );
         println!();
     }
 
@@ -498,10 +510,8 @@ fn example_3_custom_profile() -> Result<()> {
     println!("=== Example 3: Custom Profile Creation ===\n");
 
     // Create a custom profile for specific needs
-    let mut custom = OptimizationProfile::custom(
-        "ci-optimized".to_string(),
-        OptimizationLevel::Moderate,
-    );
+    let mut custom =
+        OptimizationProfile::custom("ci-optimized".to_string(), OptimizationLevel::Moderate);
     custom.description = "Optimized for CI/CD pipelines".to_string();
     custom.incremental = false; // CI always builds from scratch
     custom.debug_info = false; // No need for debug in CI
@@ -517,8 +527,14 @@ fn example_3_custom_profile() -> Result<()> {
     println!("  - Debug Info: {}", custom.debug_info);
     println!("  - Max Jobs: {}", custom.max_jobs);
     println!("\nEstimates:");
-    println!("  - Compile Time: {:.2}x baseline", custom.compilation_time_estimate());
-    println!("  - Performance: {:.2}x improvement", custom.performance_improvement());
+    println!(
+        "  - Compile Time: {:.2}x baseline",
+        custom.compilation_time_estimate()
+    );
+    println!(
+        "  - Performance: {:.2}x improvement",
+        custom.performance_improvement()
+    );
 
     Ok(())
 }
@@ -634,10 +650,8 @@ mod tests {
 
     #[test]
     fn test_custom_profile_creation() {
-        let profile = OptimizationProfile::custom(
-            "my-profile".to_string(),
-            OptimizationLevel::Moderate,
-        );
+        let profile =
+            OptimizationProfile::custom("my-profile".to_string(), OptimizationLevel::Moderate);
 
         assert_eq!(profile.name, "my-profile");
         assert_eq!(profile.optimization_level, OptimizationLevel::Moderate);
@@ -661,8 +675,8 @@ mod tests {
 
     #[test]
     fn test_run_benchmarks() {
-        let mut benchmarker = ProfileBenchmarker::new()
-            .add_profile(OptimizationProfile::development());
+        let mut benchmarker =
+            ProfileBenchmarker::new().add_profile(OptimizationProfile::development());
 
         benchmarker.run_benchmarks(100).unwrap();
 

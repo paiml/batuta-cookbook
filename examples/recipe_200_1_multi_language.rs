@@ -99,8 +99,7 @@ impl LanguageStats {
         }
 
         if self.comment_lines > 0 {
-            self.code_to_comment_ratio =
-                self.lines_of_code as f64 / self.comment_lines as f64;
+            self.code_to_comment_ratio = self.lines_of_code as f64 / self.comment_lines as f64;
         }
 
         if total_project_lines > 0 {
@@ -292,7 +291,10 @@ impl MultiLanguageAnalyzer {
             if path.is_dir() {
                 // Check if directory should be excluded
                 if let Some(dir_name) = path.file_name() {
-                    if self.exclude_dirs.contains(&dir_name.to_string_lossy().to_string()) {
+                    if self
+                        .exclude_dirs
+                        .contains(&dir_name.to_string_lossy().to_string())
+                    {
                         continue;
                     }
                 }
@@ -352,7 +354,11 @@ impl MultiLanguageAnalyzer {
     /// Analyze a single file
     fn analyze_file(&self, path: &Path) -> Result<FileStats> {
         let content = fs::read_to_string(path).map_err(|e| {
-            batuta_cookbook::Error::Analysis(format!("Failed to read file {}: {}", path.display(), e))
+            batuta_cookbook::Error::Analysis(format!(
+                "Failed to read file {}: {}",
+                path.display(),
+                e
+            ))
         })?;
 
         let lines: Vec<&str> = content.lines().collect();
@@ -364,7 +370,10 @@ impl MultiLanguageAnalyzer {
             let trimmed = line.trim();
             if trimmed.is_empty() {
                 blank_lines += 1;
-            } else if trimmed.starts_with("//") || trimmed.starts_with('#') || trimmed.starts_with("/*") {
+            } else if trimmed.starts_with("//")
+                || trimmed.starts_with('#')
+                || trimmed.starts_with("/*")
+            {
                 comment_lines += 1;
             }
         }
@@ -385,7 +394,11 @@ impl MultiLanguageAnalyzer {
         }
 
         let mut sorted: Vec<_> = language_stats.values().collect();
-        sorted.sort_by(|a, b| b.percentage_of_project.partial_cmp(&a.percentage_of_project).unwrap());
+        sorted.sort_by(|a, b| {
+            b.percentage_of_project
+                .partial_cmp(&a.percentage_of_project)
+                .unwrap()
+        });
 
         // Single language dominates
         if let Some(primary) = sorted.first() {
@@ -476,7 +489,10 @@ fn example_1_analyze_current_project() -> Result<()> {
     println!("Total Lines: {}", analysis.total_lines);
     println!("Total Files: {}", analysis.total_files);
     println!("Architecture: {}", analysis.architecture_pattern);
-    println!("Overall TDG: {} ({})", analysis.overall_tdg.score, analysis.overall_tdg.grade);
+    println!(
+        "Overall TDG: {} ({})",
+        analysis.overall_tdg.score, analysis.overall_tdg.grade
+    );
 
     if let Some(primary) = analysis.primary_language {
         println!("\n🎯 Primary Language: {}", primary);
@@ -496,10 +512,7 @@ fn example_1_analyze_current_project() -> Result<()> {
     for stats in sorted {
         println!(
             "  {} - {} lines ({:.1}%) in {} files",
-            stats.language,
-            stats.lines_of_code,
-            stats.percentage_of_project,
-            stats.file_count
+            stats.language, stats.lines_of_code, stats.percentage_of_project, stats.file_count
         );
         if let Some(tdg) = &stats.tdg_score {
             println!("    TDG: {} ({})", tdg.score, tdg.grade);
@@ -658,7 +671,10 @@ mod tests {
         assert_eq!(analysis.language_stats.len(), 1);
         assert!(analysis.language_stats.contains_key(&Language::Rust));
         assert_eq!(analysis.primary_language, Some(Language::Rust));
-        assert_eq!(analysis.architecture_pattern, ArchitecturePattern::Monolingual);
+        assert_eq!(
+            analysis.architecture_pattern,
+            ArchitecturePattern::Monolingual
+        );
     }
 
     #[test]
@@ -781,8 +797,8 @@ mod tests {
             ("custom_exclude/test.rs", "fn test() {}"),
         ]);
 
-        let analyzer = MultiLanguageAnalyzer::new()
-            .with_exclude_dirs(vec!["custom_exclude".to_string()]);
+        let analyzer =
+            MultiLanguageAnalyzer::new().with_exclude_dirs(vec!["custom_exclude".to_string()]);
 
         let analysis = analyzer.analyze(temp_dir.path()).unwrap();
 

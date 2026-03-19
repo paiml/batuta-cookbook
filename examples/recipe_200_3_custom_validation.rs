@@ -93,12 +93,7 @@ pub struct Finding {
 
 impl Finding {
     /// Create a new finding
-    pub fn new(
-        rule_id: String,
-        severity: Severity,
-        file_path: PathBuf,
-        message: String,
-    ) -> Self {
+    pub fn new(rule_id: String, severity: Severity, file_path: PathBuf, message: String) -> Self {
         Self {
             rule_id,
             severity,
@@ -396,7 +391,14 @@ impl ValidationReport {
         println!("    Errors: {}", self.error_count);
         println!("    Warnings: {}", self.warning_count);
         println!("    Info: {}", self.info_count);
-        println!("  Status: {}", if self.passed() { "PASSED ✓" } else { "FAILED ✗" });
+        println!(
+            "  Status: {}",
+            if self.passed() {
+                "PASSED ✓"
+            } else {
+                "FAILED ✗"
+            }
+        );
     }
 }
 
@@ -446,7 +448,11 @@ impl Validator {
         }
 
         let content = fs::read_to_string(file_path).map_err(|e| {
-            Error::ValidationError(format!("Failed to read file {}: {}", file_path.display(), e))
+            Error::ValidationError(format!(
+                "Failed to read file {}: {}",
+                file_path.display(),
+                e
+            ))
         })?;
 
         let mut all_findings = Vec::new();
@@ -485,13 +491,16 @@ impl Validator {
     /// Collect files recursively
     fn collect_files(dir_path: &Path, extension: &str, files: &mut Vec<PathBuf>) -> Result<()> {
         let entries = fs::read_dir(dir_path).map_err(|e| {
-            Error::ValidationError(format!("Failed to read directory {}: {}", dir_path.display(), e))
+            Error::ValidationError(format!(
+                "Failed to read directory {}: {}",
+                dir_path.display(),
+                e
+            ))
         })?;
 
         for entry in entries {
-            let entry = entry.map_err(|e| {
-                Error::ValidationError(format!("Failed to read entry: {}", e))
-            })?;
+            let entry = entry
+                .map_err(|e| Error::ValidationError(format!("Failed to read entry: {}", e)))?;
             let path = entry.path();
 
             if path.is_dir() {
@@ -566,7 +575,12 @@ fn process_data() {
 
     println!("Found {} issue(s):\n", findings.len());
     for finding in &findings {
-        println!("[{}] {} (line {})", finding.severity, finding.message, finding.line.unwrap_or(0));
+        println!(
+            "[{}] {} (line {})",
+            finding.severity,
+            finding.message,
+            finding.line.unwrap_or(0)
+        );
         if let Some(snippet) = &finding.snippet {
             println!("  > {}", snippet.trim());
         }
@@ -600,8 +614,7 @@ fn example_2_function_length() -> Result<()> {
         .map_err(|e| Error::Other(format!("Failed to write test file: {}", e)))?;
 
     // Create validator with function length rule
-    let validator = Validator::new()
-        .add_rule(FunctionLengthRule::new(20, Severity::Warning));
+    let validator = Validator::new().add_rule(FunctionLengthRule::new(20, Severity::Warning));
 
     // Validate
     let findings = validator.validate_file(&test_file)?;
@@ -855,14 +868,13 @@ mod tests {
 
     #[test]
     fn test_validator_add_rule() {
-        let validator = Validator::new()
-            .add_rule(PatternRule::new(
-                "test".to_string(),
-                "Test rule".to_string(),
-                Severity::Info,
-                "test".to_string(),
-                "Test message".to_string(),
-            ));
+        let validator = Validator::new().add_rule(PatternRule::new(
+            "test".to_string(),
+            "Test rule".to_string(),
+            Severity::Info,
+            "test".to_string(),
+            "Test message".to_string(),
+        ));
 
         assert_eq!(validator.rules.len(), 1);
     }
@@ -883,14 +895,13 @@ mod tests {
 
         fs::write(&test_file, "fn test() { panic!(\"error\"); }").unwrap();
 
-        let validator = Validator::new()
-            .add_rule(PatternRule::new_inverted(
-                "no_panic".to_string(),
-                "No panic".to_string(),
-                Severity::Error,
-                "panic!".to_string(),
-                "Found panic!".to_string(),
-            ));
+        let validator = Validator::new().add_rule(PatternRule::new_inverted(
+            "no_panic".to_string(),
+            "No panic".to_string(),
+            Severity::Error,
+            "panic!".to_string(),
+            "Found panic!".to_string(),
+        ));
 
         let findings = validator.validate_file(&test_file).unwrap();
         assert_eq!(findings.len(), 1);
@@ -906,14 +917,13 @@ mod tests {
         fs::write(&file1, "fn test1() { todo!(); }").unwrap();
         fs::write(&file2, "fn test2() { println!(\"ok\"); }").unwrap();
 
-        let validator = Validator::new()
-            .add_rule(PatternRule::new_inverted(
-                "no_todo".to_string(),
-                "No TODOs".to_string(),
-                Severity::Warning,
-                "todo!".to_string(),
-                "Found TODO".to_string(),
-            ));
+        let validator = Validator::new().add_rule(PatternRule::new_inverted(
+            "no_todo".to_string(),
+            "No TODOs".to_string(),
+            Severity::Warning,
+            "todo!".to_string(),
+            "Found TODO".to_string(),
+        ));
 
         let report = validator.validate_files(&vec![file1, file2]).unwrap();
 

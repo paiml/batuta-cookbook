@@ -41,10 +41,7 @@ pub enum Expr {
         right: Box<Expr>,
     },
     /// Function call
-    Call {
-        name: String,
-        args: Vec<Expr>,
-    },
+    Call { name: String, args: Vec<Expr> },
 }
 
 /// Binary operators
@@ -147,11 +144,13 @@ impl SemanticTransformer {
                         Op::Sub => l - r,
                         Op::Mul => l * r,
                         Op::Div if *r != 0 => l / r,
-                        Op::Div => return Expr::BinOp {
-                            op,
-                            left: Box::new(left_folded),
-                            right: Box::new(right_folded),
-                        },
+                        Op::Div => {
+                            return Expr::BinOp {
+                                op,
+                                left: Box::new(left_folded),
+                                right: Box::new(right_folded),
+                            }
+                        }
                     };
                     Expr::Int(result)
                 } else {
@@ -408,8 +407,9 @@ impl SemanticTransformer {
 
     fn get_preservation_level(&self, trans_type: TransformationType) -> PreservationLevel {
         match trans_type {
-            TransformationType::ConstantFolding
-            | TransformationType::ExpressionSimplification => PreservationLevel::Guaranteed,
+            TransformationType::ConstantFolding | TransformationType::ExpressionSimplification => {
+                PreservationLevel::Guaranteed
+            }
             TransformationType::DeadCodeElimination | TransformationType::LoopUnrolling => {
                 PreservationLevel::Likely
             }
@@ -442,9 +442,7 @@ pub struct EquivalenceChecker {
 
 impl EquivalenceChecker {
     pub fn new() -> Self {
-        Self {
-            test_cases: vec![],
-        }
+        Self { test_cases: vec![] }
     }
 
     /// Add a test case (variable assignments)
@@ -591,7 +589,11 @@ pub fn example_3_loop_unrolling() -> Result<()> {
     println!("Changes made: {}", result.changes_made);
     println!(
         "Unrolled: Loop body repeated {} times",
-        if result.changes_made > 0 { "3" } else { "still in loop" }
+        if result.changes_made > 0 {
+            "3"
+        } else {
+            "still in loop"
+        }
     );
 
     // Try with a large loop
@@ -602,7 +604,10 @@ pub fn example_3_loop_unrolling() -> Result<()> {
 
     let result2 = transformer.transform_stmt(large_loop, TransformationType::LoopUnrolling);
     println!("\nLarge loop (100 iterations):");
-    println!("Changes made: {} (not unrolled, exceeds max)", result2.changes_made);
+    println!(
+        "Changes made: {} (not unrolled, exceeds max)",
+        result2.changes_made
+    );
 
     Ok(())
 }
@@ -830,7 +835,10 @@ mod tests {
 
         let result = transformer.transform_stmt(stmt, TransformationType::ConstantFolding);
 
-        assert_eq!(result.transformation_type, TransformationType::ConstantFolding);
+        assert_eq!(
+            result.transformation_type,
+            TransformationType::ConstantFolding
+        );
         assert_eq!(result.preservation_level, PreservationLevel::Guaranteed);
     }
 }

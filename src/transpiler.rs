@@ -44,21 +44,21 @@ pub struct ConfigBuilder {
 
 impl ConfigBuilder {
     /// Set source language
-    #[must_use] 
+    #[must_use]
     pub fn source_language(mut self, lang: Language) -> Self {
         self.source_lang = Some(lang);
         self
     }
 
     /// Enable incremental compilation
-    #[must_use] 
+    #[must_use]
     pub fn incremental(mut self, enabled: bool) -> Self {
         self.incremental = enabled;
         self
     }
 
     /// Enable caching
-    #[must_use] 
+    #[must_use]
     pub fn cache(mut self, enabled: bool) -> Self {
         self.cache_enabled = enabled;
         self
@@ -86,7 +86,7 @@ pub struct Transpiler {
 
 impl Transpiler {
     /// Create a new transpiler with the given configuration
-    #[must_use] 
+    #[must_use]
     pub fn new(config: TranspilerConfig) -> Self {
         Self { config }
     }

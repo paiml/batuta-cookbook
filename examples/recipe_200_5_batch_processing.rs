@@ -72,9 +72,9 @@ impl TaskResult {
     /// Get file path
     pub fn file(&self) -> &Path {
         match self {
-            Self::Success { file, .. } | Self::Failure { file, .. } | Self::Skipped { file, .. } => {
-                file
-            }
+            Self::Success { file, .. }
+            | Self::Failure { file, .. }
+            | Self::Skipped { file, .. } => file,
         }
     }
 }
@@ -263,7 +263,11 @@ impl BatchReport {
     pub fn print_summary(&self) {
         println!("Batch Processing Report:");
         println!("  Total Files: {}", self.results.len());
-        println!("  Successful: {} ({:.1}%)", self.success_count, self.success_rate());
+        println!(
+            "  Successful: {} ({:.1}%)",
+            self.success_count,
+            self.success_rate()
+        );
         println!("  Failed: {}", self.failure_count);
         println!("  Skipped: {}", self.skipped_count);
         println!("  Total Time: {:.2}s", self.total_time.as_secs_f64());
@@ -353,7 +357,10 @@ fn example_2_with_progress() -> Result<()> {
 
     let processor = BatchProcessor::new(config);
 
-    println!("Processing {} files with progress tracking...\n", files.len());
+    println!(
+        "Processing {} files with progress tracking...\n",
+        files.len()
+    );
 
     let report = processor.process(files, |_file| {
         // Simulate processing
@@ -393,7 +400,9 @@ fn example_3_error_handling() -> Result<()> {
     let report = processor.process(files, |file| {
         // Simulate intermittent failures
         if file.to_string_lossy().contains("data_5") || file.to_string_lossy().contains("data_11") {
-            return Err(batuta_cookbook::Error::Other("Processing failed".to_string()));
+            return Err(batuta_cookbook::Error::Other(
+                "Processing failed".to_string(),
+            ));
         }
 
         std::thread::sleep(Duration::from_millis(8));

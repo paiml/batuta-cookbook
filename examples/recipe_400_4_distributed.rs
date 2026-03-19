@@ -50,9 +50,19 @@ pub enum JobPriority {
 #[derive(Debug, Clone, PartialEq)]
 pub enum JobStatus {
     Pending,
-    InProgress { worker_id: String, started_at: Instant },
-    Completed { worker_id: String, duration: Duration },
-    Failed { worker_id: String, error: String, retry_count: usize },
+    InProgress {
+        worker_id: String,
+        started_at: Instant,
+    },
+    Completed {
+        worker_id: String,
+        duration: Duration,
+    },
+    Failed {
+        worker_id: String,
+        error: String,
+        retry_count: usize,
+    },
 }
 
 /// Worker node in the distributed system
@@ -260,7 +270,8 @@ impl DistributedCoordinator {
         // Assign job to worker
         {
             let mut workers = self.workers.lock().unwrap();
-            let worker = workers.get_mut(&worker_id)
+            let worker = workers
+                .get_mut(&worker_id)
                 .ok_or_else(|| format!("Worker {} not found", worker_id))?;
             worker.assign_job(job.files.len())?;
         }
@@ -271,7 +282,8 @@ impl DistributedCoordinator {
         // Update worker and results
         {
             let mut workers = self.workers.lock().unwrap();
-            let worker = workers.get_mut(&worker_id)
+            let worker = workers
+                .get_mut(&worker_id)
                 .ok_or_else(|| format!("Worker {} not found", worker_id))?;
 
             match &result {
@@ -325,14 +337,12 @@ impl DistributedCoordinator {
                 *index += 1;
                 Ok(worker_id)
             }
-            LoadBalancingStrategy::LeastLoaded => {
-                workers
-                    .values()
-                    .filter(|w| w.is_available())
-                    .min_by_key(|w| w.current_load)
-                    .map(|w| w.id.clone())
-                    .ok_or_else(|| "No available workers".to_string())
-            }
+            LoadBalancingStrategy::LeastLoaded => workers
+                .values()
+                .filter(|w| w.is_available())
+                .min_by_key(|w| w.current_load)
+                .map(|w| w.id.clone())
+                .ok_or_else(|| "No available workers".to_string()),
             LoadBalancingStrategy::CapacityBased => {
                 workers
                     .values()
@@ -341,7 +351,8 @@ impl DistributedCoordinator {
                     .map(|w| w.id.clone())
                     .or_else(|| {
                         // Fallback to any available worker
-                        workers.values()
+                        workers
+                            .values()
                             .filter(|w| w.is_available())
                             .max_by_key(|w| w.available_capacity())
                             .map(|w| w.id.clone())
@@ -488,7 +499,9 @@ fn example_basic_distributed() -> Result<()> {
     for i in 0..5 {
         let job = DistributedJob {
             id: format!("job-{}", i),
-            files: (0..5).map(|j| PathBuf::from(format!("file-{}-{}.rs", i, j))).collect(),
+            files: (0..5)
+                .map(|j| PathBuf::from(format!("file-{}-{}.rs", i, j)))
+                .collect(),
             priority: JobPriority::Normal,
             created_at: Instant::now(),
             timeout: Duration::from_secs(60),
@@ -533,7 +546,9 @@ fn example_load_balancing() -> Result<()> {
         for i in 0..6 {
             let job = DistributedJob {
                 id: format!("job-{}", i),
-                files: (0..3).map(|j| PathBuf::from(format!("file-{}.rs", j))).collect(),
+                files: (0..3)
+                    .map(|j| PathBuf::from(format!("file-{}.rs", j)))
+                    .collect(),
                 priority: JobPriority::Normal,
                 created_at: Instant::now(),
                 timeout: Duration::from_secs(60),
@@ -546,11 +561,17 @@ fn example_load_balancing() -> Result<()> {
 
         println!("Strategy: {:?}", strategy);
         for worker in &worker_stats {
-            println!("  {}: {} jobs completed, {:.1}% utilization",
-                worker.id, worker.completed_jobs, worker.utilization());
+            println!(
+                "  {}: {} jobs completed, {:.1}% utilization",
+                worker.id,
+                worker.completed_jobs,
+                worker.utilization()
+            );
         }
-        println!("  Success rate: {:.1}%\n",
-            DistributedMetrics::from_results(&results, 3).success_rate());
+        println!(
+            "  Success rate: {:.1}%\n",
+            DistributedMetrics::from_results(&results, 3).success_rate()
+        );
     }
 
     Ok(())
@@ -587,16 +608,24 @@ fn example_fault_tolerance() -> Result<()> {
 
     println!("\nFault Tolerance Results:");
     println!("  Total jobs: {}", results.len());
-    println!("  Successful: {}", results.iter().filter(|r| r.success).count());
-    println!("  Failed: {}", results.iter().filter(|r| !r.success).count());
+    println!(
+        "  Successful: {}",
+        results.iter().filter(|r| r.success).count()
+    );
+    println!(
+        "  Failed: {}",
+        results.iter().filter(|r| !r.success).count()
+    );
     println!("  Unhealthy workers: {}", unhealthy.len());
 
     // Display worker health
     let worker_stats = coordinator.get_worker_stats();
     println!("\nWorker Health:");
     for worker in &worker_stats {
-        println!("  {}: {:?} (completed: {}, failed: {})",
-            worker.id, worker.status, worker.completed_jobs, worker.failed_jobs);
+        println!(
+            "  {}: {:?} (completed: {}, failed: {})",
+            worker.id, worker.status, worker.completed_jobs, worker.failed_jobs
+        );
     }
 
     Ok(())
@@ -734,8 +763,12 @@ mod tests {
     fn test_load_balancing_round_robin() {
         let coordinator = DistributedCoordinator::new(LoadBalancingStrategy::RoundRobin);
 
-        coordinator.register_worker(WorkerNode::new("w1".to_string(), 10)).unwrap();
-        coordinator.register_worker(WorkerNode::new("w2".to_string(), 10)).unwrap();
+        coordinator
+            .register_worker(WorkerNode::new("w1".to_string(), 10))
+            .unwrap();
+        coordinator
+            .register_worker(WorkerNode::new("w2".to_string(), 10))
+            .unwrap();
 
         let job = DistributedJob {
             id: "test".to_string(),
@@ -823,12 +856,18 @@ mod tests {
     fn test_capacity_based_load_balancing() {
         let coordinator = DistributedCoordinator::new(LoadBalancingStrategy::CapacityBased);
 
-        coordinator.register_worker(WorkerNode::new("small".to_string(), 5)).unwrap();
-        coordinator.register_worker(WorkerNode::new("large".to_string(), 20)).unwrap();
+        coordinator
+            .register_worker(WorkerNode::new("small".to_string(), 5))
+            .unwrap();
+        coordinator
+            .register_worker(WorkerNode::new("large".to_string(), 20))
+            .unwrap();
 
         let large_job = DistributedJob {
             id: "large".to_string(),
-            files: (0..15).map(|i| PathBuf::from(format!("file-{}.rs", i))).collect(),
+            files: (0..15)
+                .map(|i| PathBuf::from(format!("file-{}.rs", i)))
+                .collect(),
             priority: JobPriority::Normal,
             created_at: Instant::now(),
             timeout: Duration::from_secs(60),

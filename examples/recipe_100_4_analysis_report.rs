@@ -234,8 +234,14 @@ impl ReportGenerator {
 
         // Metrics
         md.push_str("## 📈 Project Metrics\n\n");
-        md.push_str(&format!("- **Total Lines of Code:** {}\n", format_number(report.metrics.total_lines)));
-        md.push_str(&format!("- **Files Analyzed:** {}\n", report.metrics.file_count));
+        md.push_str(&format!(
+            "- **Total Lines of Code:** {}\n",
+            format_number(report.metrics.total_lines)
+        ));
+        md.push_str(&format!(
+            "- **Files Analyzed:** {}\n",
+            report.metrics.file_count
+        ));
         md.push_str(&format!(
             "- **Average Lines per File:** {:.1}\n",
             report.metrics.avg_lines_per_file
@@ -251,9 +257,13 @@ impl ReportGenerator {
             let mut langs: Vec<_> = report.metrics.language_distribution.iter().collect();
             langs.sort_by_key(|(_, count)| std::cmp::Reverse(*count));
             for (lang, lines) in langs {
-                let percentage =
-                    (*lines as f64 / report.metrics.total_lines as f64) * 100.0;
-                md.push_str(&format!("- **{}:** {} lines ({:.1}%)\n", lang, format_number(*lines), percentage));
+                let percentage = (*lines as f64 / report.metrics.total_lines as f64) * 100.0;
+                md.push_str(&format!(
+                    "- **{}:** {} lines ({:.1}%)\n",
+                    lang,
+                    format_number(*lines),
+                    percentage
+                ));
             }
             md.push_str("\n");
         }
@@ -285,8 +295,13 @@ impl ReportGenerator {
 
         html.push_str("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n");
         html.push_str("    <meta charset=\"UTF-8\">\n");
-        html.push_str("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
-        html.push_str(&format!("    <title>Analysis Report - {}</title>\n", report.project_name));
+        html.push_str(
+            "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n",
+        );
+        html.push_str(&format!(
+            "    <title>Analysis Report - {}</title>\n",
+            report.project_name
+        ));
         html.push_str("    <style>\n");
         html.push_str(REPORT_CSS);
         html.push_str("    </style>\n");
@@ -297,7 +312,10 @@ impl ReportGenerator {
             "    <div class=\"container\">\n        <h1>📊 Analysis Report: {}</h1>\n",
             report.project_name
         ));
-        html.push_str(&format!("        <p class=\"timestamp\">Generated: {}</p>\n\n", report.timestamp));
+        html.push_str(&format!(
+            "        <p class=\"timestamp\">Generated: {}</p>\n\n",
+            report.timestamp
+        ));
 
         // TDG Score Card
         let grade_class = match report.tdg_score.grade.as_str() {
@@ -361,9 +379,8 @@ impl ReportGenerator {
     /// Write report to file
     pub fn write_to_file(&self, report: &AnalysisReport, output_path: &Path) -> Result<()> {
         let content = self.generate(report)?;
-        fs::write(output_path, content).map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to write report: {}", e))
-        })?;
+        fs::write(output_path, content)
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to write report: {}", e)))?;
         Ok(())
     }
 }
@@ -401,9 +418,15 @@ fn example_1_json_report() -> Result<()> {
     let mut metrics = ProjectMetrics::new();
     metrics.total_lines = 5420;
     metrics.file_count = 42;
-    metrics.language_distribution.insert("Rust".to_string(), 3800);
-    metrics.language_distribution.insert("Python".to_string(), 1200);
-    metrics.language_distribution.insert("JavaScript".to_string(), 420);
+    metrics
+        .language_distribution
+        .insert("Rust".to_string(), 3800);
+    metrics
+        .language_distribution
+        .insert("Python".to_string(), 1200);
+    metrics
+        .language_distribution
+        .insert("JavaScript".to_string(), 420);
     metrics.complexity_score = 72.5;
     metrics.calculate_averages();
 
@@ -444,9 +467,15 @@ fn example_2_markdown_report() -> Result<()> {
     let mut metrics = ProjectMetrics::new();
     metrics.total_lines = 12840;
     metrics.file_count = 89;
-    metrics.language_distribution.insert("Rust".to_string(), 8200);
-    metrics.language_distribution.insert("TOML".to_string(), 320);
-    metrics.language_distribution.insert("Markdown".to_string(), 4320);
+    metrics
+        .language_distribution
+        .insert("Rust".to_string(), 8200);
+    metrics
+        .language_distribution
+        .insert("TOML".to_string(), 320);
+    metrics
+        .language_distribution
+        .insert("Markdown".to_string(), 4320);
     metrics.complexity_score = 65.8;
     metrics.calculate_averages();
 
@@ -489,8 +518,12 @@ fn example_3_save_reports() -> Result<()> {
     let mut metrics = ProjectMetrics::new();
     metrics.total_lines = 8500;
     metrics.file_count = 64;
-    metrics.language_distribution.insert("Rust".to_string(), 7000);
-    metrics.language_distribution.insert("Shell".to_string(), 1500);
+    metrics
+        .language_distribution
+        .insert("Rust".to_string(), 7000);
+    metrics
+        .language_distribution
+        .insert("Shell".to_string(), 1500);
     metrics.complexity_score = 78.2;
     metrics.calculate_averages();
 
@@ -523,7 +556,11 @@ fn example_3_save_reports() -> Result<()> {
         let output_path = Path::new("/tmp").join(filename);
 
         generator.write_to_file(&report, &output_path)?;
-        println!("✓ Generated {} report: {}", format.extension(), output_path.display());
+        println!(
+            "✓ Generated {} report: {}",
+            format.extension(),
+            output_path.display()
+        );
     }
 
     println!("\nAll reports generated successfully!");
@@ -720,8 +757,12 @@ mod tests {
     fn test_language_distribution_percentage() {
         let mut metrics = ProjectMetrics::new();
         metrics.total_lines = 1000;
-        metrics.language_distribution.insert("Rust".to_string(), 700);
-        metrics.language_distribution.insert("Python".to_string(), 300);
+        metrics
+            .language_distribution
+            .insert("Rust".to_string(), 700);
+        metrics
+            .language_distribution
+            .insert("Python".to_string(), 300);
 
         let tdg = TdgScore {
             score: 85.0,

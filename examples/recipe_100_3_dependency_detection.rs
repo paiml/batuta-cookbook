@@ -316,8 +316,14 @@ fn example_2_custom_config() -> Result<()> {
 
     let managers = detect_dependency_managers(project_path, &config)?;
 
-    println!("Found {} dependency manager(s) with custom config:\n", managers.len());
-    println!("Config: max_depth={}, follow_symlinks={}", config.max_depth, config.follow_symlinks);
+    println!(
+        "Found {} dependency manager(s) with custom config:\n",
+        managers.len()
+    );
+    println!(
+        "Config: max_depth={}, follow_symlinks={}",
+        config.max_depth, config.follow_symlinks
+    );
     println!();
 
     for manager in &managers {
@@ -476,9 +482,9 @@ mod tests {
     #[test]
     fn test_all_supported_ecosystems() {
         let temp_dir = create_test_project(&[
-            "package.json",      // JavaScript
-            "Cargo.toml",        // Rust
-            "requirements.txt",  // Python
+            "package.json",     // JavaScript
+            "Cargo.toml",       // Rust
+            "requirements.txt", // Python
             "pom.xml",          // Java (Maven)
             "build.gradle",     // Java (Gradle)
             "go.mod",           // Go
@@ -492,9 +498,7 @@ mod tests {
 
         assert_eq!(managers.len(), 9);
 
-        let ecosystems: HashSet<String> = managers.iter()
-            .map(|m| m.ecosystem.clone())
-            .collect();
+        let ecosystems: HashSet<String> = managers.iter().map(|m| m.ecosystem.clone()).collect();
 
         assert!(ecosystems.contains("JavaScript"));
         assert!(ecosystems.contains("Rust"));

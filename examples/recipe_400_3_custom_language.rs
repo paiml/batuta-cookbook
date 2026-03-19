@@ -268,9 +268,9 @@ impl Lexer {
             self.advance();
         }
 
-        let value = number.parse::<i64>().map_err(|e| {
-            batuta_cookbook::Error::Other(format!("Failed to parse number: {}", e))
-        })?;
+        let value = number
+            .parse::<i64>()
+            .map_err(|e| batuta_cookbook::Error::Other(format!("Failed to parse number: {}", e)))?;
 
         Ok(Token::new(TokenType::Integer(value), line, column))
     }
@@ -331,7 +331,10 @@ impl Lexer {
     }
 
     fn is_operator_start(&self, ch: char) -> bool {
-        matches!(ch, '+' | '-' | '*' | '/' | '=' | '<' | '>' | '!' | '&' | '|')
+        matches!(
+            ch,
+            '+' | '-' | '*' | '/' | '=' | '<' | '>' | '!' | '&' | '|'
+        )
     }
 
     fn is_symbol(&self, ch: char) -> bool {
@@ -511,7 +514,10 @@ pub fn example_1_simple_dsl() -> Result<()> {
     println!("\nTokens:");
     for token in &tokens {
         if !matches!(token.token_type, TokenType::Eof) {
-            println!("  {:?} at {}:{}", token.token_type, token.line, token.column);
+            println!(
+                "  {:?} at {}:{}",
+                token.token_type, token.line, token.column
+            );
         }
     }
 
@@ -560,10 +566,9 @@ pub fn example_2_language_registry() -> Result<()> {
 
     println!("\nLookup by extension '.pyl':");
     if let Some(lang) = registry.get_by_extension("pyl") {
-        println!("  Found: {} (classes: {}, typed: {})",
-            lang.name,
-            lang.features.has_classes,
-            lang.features.is_statically_typed
+        println!(
+            "  Found: {} (classes: {}, typed: {})",
+            lang.name, lang.features.has_classes, lang.features.is_statically_typed
         );
     }
 
@@ -686,8 +691,8 @@ mod tests {
 
     #[test]
     fn test_lexer_tokenize_operator() {
-        let spec = LanguageSpec::new("Test".to_string(), "1.0".to_string())
-            .with_operator("+".to_string());
+        let spec =
+            LanguageSpec::new("Test".to_string(), "1.0".to_string()).with_operator("+".to_string());
         let mut lexer = Lexer::new("1 + 2".to_string(), spec);
 
         let tokens = lexer.tokenize().unwrap();
@@ -739,11 +744,8 @@ mod tests {
 
     #[test]
     fn test_transpilation_rule() {
-        let rule = TranspilationRule::new(
-            "func".to_string(),
-            "fn".to_string(),
-            "Function".to_string(),
-        );
+        let rule =
+            TranspilationRule::new("func".to_string(), "fn".to_string(), "Function".to_string());
 
         assert_eq!(rule.source_pattern, "func");
         assert_eq!(rule.target_pattern, "fn");

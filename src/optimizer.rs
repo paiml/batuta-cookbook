@@ -26,7 +26,7 @@ pub struct Optimizer {
 
 impl Optimizer {
     /// Create a new optimizer with the given profile
-    #[must_use] 
+    #[must_use]
     pub fn new(profile: OptimizationProfile) -> Self {
         Self {
             profile,
@@ -35,7 +35,7 @@ impl Optimizer {
     }
 
     /// Enable GPU acceleration
-    #[must_use] 
+    #[must_use]
     pub fn with_gpu(mut self, enabled: bool) -> Self {
         self.gpu_enabled = enabled;
         self

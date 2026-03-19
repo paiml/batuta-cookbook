@@ -58,7 +58,7 @@ pub enum Language {
 
 impl Language {
     /// Get file extensions for this language
-    #[must_use] 
+    #[must_use]
     pub fn extensions(self) -> &'static [&'static str] {
         match self {
             Self::Python => &["py", "pyw"],
@@ -120,7 +120,7 @@ pub enum Grade {
 
 impl Grade {
     /// Convert score to grade
-    #[must_use] 
+    #[must_use]
     pub fn from_score(score: f64) -> Self {
         match score {
             s if s >= 95.0 => Self::APlus,

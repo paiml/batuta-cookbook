@@ -17,7 +17,7 @@ pub struct ValidationReport {
 
 impl ValidationReport {
     /// Calculate speedup factor
-    #[must_use] 
+    #[must_use]
     pub fn speedup(&self) -> f64 {
         if self.transpiled_time_secs > 0.0 {
             self.original_time_secs / self.transpiled_time_secs

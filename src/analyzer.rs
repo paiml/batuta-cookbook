@@ -91,7 +91,7 @@ pub struct AnalysisReport {
 
 impl AnalysisReport {
     /// Get TDG score or calculate a default
-    #[must_use] 
+    #[must_use]
     pub fn tdg(&self) -> TdgScore {
         self.tdg_score.unwrap_or(TdgScore {
             score: 75.0,

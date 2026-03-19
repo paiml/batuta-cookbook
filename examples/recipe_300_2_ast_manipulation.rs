@@ -40,15 +40,9 @@ pub enum AstNode {
         body: Vec<AstNode>,
     },
     /// Variable declaration
-    VarDecl {
-        name: String,
-        value: Box<AstNode>,
-    },
+    VarDecl { name: String, value: Box<AstNode> },
     /// Assignment expression
-    Assignment {
-        target: String,
-        value: Box<AstNode>,
-    },
+    Assignment { target: String, value: Box<AstNode> },
     /// Binary operation
     BinaryOp {
         op: BinaryOperator,
@@ -316,7 +310,10 @@ impl AstTransformer {
     }
 
     fn rename_if_needed(&self, name: &str) -> String {
-        self.renames.get(name).cloned().unwrap_or_else(|| name.to_string())
+        self.renames
+            .get(name)
+            .cloned()
+            .unwrap_or_else(|| name.to_string())
     }
 }
 
@@ -365,10 +362,20 @@ impl CodeGenerator {
                 result
             }
             AstNode::VarDecl { name, value } => {
-                format!("{}let {} = {};", self.indent(), name, self.generate_expr(value))
+                format!(
+                    "{}let {} = {};",
+                    self.indent(),
+                    name,
+                    self.generate_expr(value)
+                )
             }
             AstNode::Assignment { target, value } => {
-                format!("{}{} = {};", self.indent(), target, self.generate_expr(value))
+                format!(
+                    "{}{} = {};",
+                    self.indent(),
+                    target,
+                    self.generate_expr(value)
+                )
             }
             AstNode::Call { function, args } => {
                 let args_str = args
@@ -733,7 +740,9 @@ mod tests {
         let ast = AstNode::Function {
             name: "test".to_string(),
             params: vec!["a".to_string()],
-            body: vec![AstNode::Return(Box::new(AstNode::Identifier("a".to_string())))],
+            body: vec![AstNode::Return(Box::new(AstNode::Identifier(
+                "a".to_string(),
+            )))],
         };
 
         let mut gen = CodeGenerator::new();
@@ -744,14 +753,8 @@ mod tests {
 
     #[test]
     fn test_literal_value_equality() {
-        assert_eq!(
-            LiteralValue::Integer(42),
-            LiteralValue::Integer(42)
-        );
-        assert_ne!(
-            LiteralValue::Integer(42),
-            LiteralValue::Integer(43)
-        );
+        assert_eq!(LiteralValue::Integer(42), LiteralValue::Integer(42));
+        assert_ne!(LiteralValue::Integer(42), LiteralValue::Integer(43));
     }
 
     #[test]

@@ -188,7 +188,8 @@ impl MlOptimizer {
         for (strategy, (successes, total, speedup_sum)) in strategy_stats {
             let success_rate = successes as f64 / total as f64;
             let avg_speedup = speedup_sum / total as f64;
-            self.strategy_scores.insert(strategy, success_rate * avg_speedup);
+            self.strategy_scores
+                .insert(strategy, success_rate * avg_speedup);
         }
 
         // Update feature weights based on correlation analysis
@@ -230,7 +231,9 @@ impl MlOptimizer {
 
     pub fn recommend(&self, features: &CodeFeatures) -> OptimizationPrediction {
         let predictions = self.predict(features);
-        predictions.into_iter().next()
+        predictions
+            .into_iter()
+            .next()
             .unwrap_or_else(|| OptimizationPrediction {
                 strategy: OptimizationStrategy::DeadCodeElimination,
                 confidence: 0.5,
@@ -239,7 +242,11 @@ impl MlOptimizer {
             })
     }
 
-    fn calculate_feature_score(&self, features: &CodeFeatures, strategy: OptimizationStrategy) -> f64 {
+    fn calculate_feature_score(
+        &self,
+        features: &CodeFeatures,
+        strategy: OptimizationStrategy,
+    ) -> f64 {
         match strategy {
             OptimizationStrategy::LoopUnrolling => {
                 if features.loop_count > 0 {
@@ -273,7 +280,8 @@ impl MlOptimizer {
             }
             OptimizationStrategy::MemoryPooling => {
                 if features.memory_allocations > 10 {
-                    (features.memory_allocations as f64 * self.feature_weights.memory_weight * 0.1).min(2.0)
+                    (features.memory_allocations as f64 * self.feature_weights.memory_weight * 0.1)
+                        .min(2.0)
                 } else {
                     0.3
                 }
@@ -309,16 +317,25 @@ impl MlOptimizer {
         (base_speedup * feature_factor).max(1.0).min(10.0)
     }
 
-    fn generate_reasoning(&self, features: &CodeFeatures, strategy: OptimizationStrategy) -> Vec<String> {
+    fn generate_reasoning(
+        &self,
+        features: &CodeFeatures,
+        strategy: OptimizationStrategy,
+    ) -> Vec<String> {
         let mut reasoning = Vec::new();
 
         match strategy {
             OptimizationStrategy::LoopUnrolling => {
                 if features.loop_count > 0 {
-                    reasoning.push(format!("Code contains {} loops that could benefit from unrolling", features.loop_count));
+                    reasoning.push(format!(
+                        "Code contains {} loops that could benefit from unrolling",
+                        features.loop_count
+                    ));
                 }
                 if features.loop_count > 5 {
-                    reasoning.push("High loop count indicates significant unrolling potential".to_string());
+                    reasoning.push(
+                        "High loop count indicates significant unrolling potential".to_string(),
+                    );
                 }
             }
             OptimizationStrategy::Inlining => {
@@ -328,19 +345,28 @@ impl MlOptimizer {
             }
             OptimizationStrategy::MemoryPooling => {
                 if features.memory_allocations > 10 {
-                    reasoning.push(format!("{} memory allocations detected, pooling could reduce allocation overhead", features.memory_allocations));
+                    reasoning.push(format!(
+                        "{} memory allocations detected, pooling could reduce allocation overhead",
+                        features.memory_allocations
+                    ));
                 }
             }
             OptimizationStrategy::Parallelization => {
                 if features.loop_count > 2 {
-                    reasoning.push("Multiple loops detected, suitable for parallel execution".to_string());
+                    reasoning.push(
+                        "Multiple loops detected, suitable for parallel execution".to_string(),
+                    );
                 }
                 if features.io_operations < 5 {
-                    reasoning.push("Low I/O operations, good for CPU-bound parallelization".to_string());
+                    reasoning
+                        .push("Low I/O operations, good for CPU-bound parallelization".to_string());
                 }
             }
             _ => {
-                reasoning.push(format!("Strategy {:?} recommended based on code patterns", strategy));
+                reasoning.push(format!(
+                    "Strategy {:?} recommended based on code patterns",
+                    strategy
+                ));
             }
         }
 
@@ -376,9 +402,7 @@ impl MlOptimizer {
             return 0.0;
         }
 
-        let successes = self.training_data.iter()
-            .filter(|e| e.success)
-            .count();
+        let successes = self.training_data.iter().filter(|e| e.success).count();
 
         (successes as f64 / self.training_data.len() as f64) * 100.0
     }
@@ -533,7 +557,10 @@ fn process_data(input: Vec<i32>) -> Vec<i32> {
 
     println!("Extracted Features:");
     println!("  Lines of Code: {}", features.lines_of_code);
-    println!("  Cyclomatic Complexity: {}", features.cyclomatic_complexity);
+    println!(
+        "  Cyclomatic Complexity: {}",
+        features.cyclomatic_complexity
+    );
     println!("  Function Count: {}", features.function_count);
     println!("  Loop Count: {}", features.loop_count);
     println!("  Memory Allocations: {}", features.memory_allocations);
@@ -651,57 +678,57 @@ fn example_transfer_learning() -> Result<()> {
     // Train on source domain (web applications)
     let mut source_optimizer = MlOptimizer::new();
 
-    let web_app_data = vec![
-        TrainingExample {
-            features: CodeFeatures {
-                lines_of_code: 150,
-                cyclomatic_complexity: 12,
-                function_count: 8,
-                loop_count: 2,
-                recursion_depth: 0,
-                memory_allocations: 10,
-                io_operations: 15,
-                dependencies_count: 20,
-            },
-            strategy: OptimizationStrategy::CacheOptimization,
-            speedup: 2.5,
-            success: true,
+    let web_app_data = vec![TrainingExample {
+        features: CodeFeatures {
+            lines_of_code: 150,
+            cyclomatic_complexity: 12,
+            function_count: 8,
+            loop_count: 2,
+            recursion_depth: 0,
+            memory_allocations: 10,
+            io_operations: 15,
+            dependencies_count: 20,
         },
-    ];
+        strategy: OptimizationStrategy::CacheOptimization,
+        speedup: 2.5,
+        success: true,
+    }];
 
     source_optimizer.train(web_app_data)?;
     println!("Source model trained on web applications");
 
     // Adapt to target domain (data processing)
-    let mut transfer_learner = TransferLearner::new(
-        source_optimizer,
-        "data-processing".to_string(),
-    );
+    let mut transfer_learner =
+        TransferLearner::new(source_optimizer, "data-processing".to_string());
 
-    let data_processing_examples = vec![
-        TrainingExample {
-            features: CodeFeatures {
-                lines_of_code: 120,
-                cyclomatic_complexity: 8,
-                function_count: 6,
-                loop_count: 6,
-                recursion_depth: 0,
-                memory_allocations: 8,
-                io_operations: 2,
-                dependencies_count: 12,
-            },
-            strategy: OptimizationStrategy::Parallelization,
-            speedup: 3.8,
-            success: true,
+    let data_processing_examples = vec![TrainingExample {
+        features: CodeFeatures {
+            lines_of_code: 120,
+            cyclomatic_complexity: 8,
+            function_count: 6,
+            loop_count: 6,
+            recursion_depth: 0,
+            memory_allocations: 8,
+            io_operations: 2,
+            dependencies_count: 12,
         },
-    ];
+        strategy: OptimizationStrategy::Parallelization,
+        speedup: 3.8,
+        success: true,
+    }];
 
     let adaptation_metrics = transfer_learner.adapt(data_processing_examples)?;
 
     println!("\nTransfer Learning Results:");
     println!("  Target Domain: {}", adaptation_metrics.domain);
-    println!("  Initial Accuracy: {:.1}%", adaptation_metrics.initial_accuracy);
-    println!("  Final Accuracy: {:.1}%", adaptation_metrics.final_accuracy);
+    println!(
+        "  Initial Accuracy: {:.1}%",
+        adaptation_metrics.initial_accuracy
+    );
+    println!(
+        "  Final Accuracy: {:.1}%",
+        adaptation_metrics.final_accuracy
+    );
     println!("  Improvement: {:.1}%", adaptation_metrics.improvement);
     println!("  Examples Used: {}", adaptation_metrics.examples_used);
 
@@ -765,23 +792,21 @@ mod tests {
     fn test_prediction() {
         let mut optimizer = MlOptimizer::new();
 
-        let training = vec![
-            TrainingExample {
-                features: CodeFeatures {
-                    lines_of_code: 100,
-                    cyclomatic_complexity: 10,
-                    function_count: 5,
-                    loop_count: 5,
-                    recursion_depth: 0,
-                    memory_allocations: 3,
-                    io_operations: 0,
-                    dependencies_count: 8,
-                },
-                strategy: OptimizationStrategy::LoopUnrolling,
-                speedup: 2.0,
-                success: true,
+        let training = vec![TrainingExample {
+            features: CodeFeatures {
+                lines_of_code: 100,
+                cyclomatic_complexity: 10,
+                function_count: 5,
+                loop_count: 5,
+                recursion_depth: 0,
+                memory_allocations: 3,
+                io_operations: 0,
+                dependencies_count: 8,
             },
-        ];
+            strategy: OptimizationStrategy::LoopUnrolling,
+            speedup: 2.0,
+            success: true,
+        }];
 
         optimizer.train(training).unwrap();
 
@@ -805,23 +830,21 @@ mod tests {
     fn test_recommendation() {
         let mut optimizer = MlOptimizer::new();
 
-        let training = vec![
-            TrainingExample {
-                features: CodeFeatures {
-                    lines_of_code: 50,
-                    cyclomatic_complexity: 5,
-                    function_count: 2,
-                    loop_count: 3,
-                    recursion_depth: 0,
-                    memory_allocations: 1,
-                    io_operations: 0,
-                    dependencies_count: 5,
-                },
-                strategy: OptimizationStrategy::LoopUnrolling,
-                speedup: 1.5,
-                success: true,
+        let training = vec![TrainingExample {
+            features: CodeFeatures {
+                lines_of_code: 50,
+                cyclomatic_complexity: 5,
+                function_count: 2,
+                loop_count: 3,
+                recursion_depth: 0,
+                memory_allocations: 1,
+                io_operations: 0,
+                dependencies_count: 5,
             },
-        ];
+            strategy: OptimizationStrategy::LoopUnrolling,
+            speedup: 1.5,
+            success: true,
+        }];
 
         optimizer.train(training).unwrap();
 
@@ -845,23 +868,21 @@ mod tests {
     fn test_evaluation_metrics() {
         let mut optimizer = MlOptimizer::new();
 
-        let training = vec![
-            TrainingExample {
-                features: CodeFeatures {
-                    lines_of_code: 100,
-                    cyclomatic_complexity: 10,
-                    function_count: 5,
-                    loop_count: 5,
-                    recursion_depth: 0,
-                    memory_allocations: 3,
-                    io_operations: 0,
-                    dependencies_count: 8,
-                },
-                strategy: OptimizationStrategy::LoopUnrolling,
-                speedup: 2.0,
-                success: true,
+        let training = vec![TrainingExample {
+            features: CodeFeatures {
+                lines_of_code: 100,
+                cyclomatic_complexity: 10,
+                function_count: 5,
+                loop_count: 5,
+                recursion_depth: 0,
+                memory_allocations: 3,
+                io_operations: 0,
+                dependencies_count: 8,
             },
-        ];
+            strategy: OptimizationStrategy::LoopUnrolling,
+            speedup: 2.0,
+            success: true,
+        }];
 
         optimizer.train(training.clone()).unwrap();
 
@@ -885,7 +906,8 @@ mod tests {
             dependencies_count: 5,
         };
 
-        let score = optimizer.calculate_feature_score(&features, OptimizationStrategy::LoopUnrolling);
+        let score =
+            optimizer.calculate_feature_score(&features, OptimizationStrategy::LoopUnrolling);
         assert!(score > 0.0);
     }
 
@@ -920,45 +942,41 @@ mod tests {
     fn test_transfer_learning_adaptation() {
         let mut source_model = MlOptimizer::new();
 
-        let source_data = vec![
-            TrainingExample {
-                features: CodeFeatures {
-                    lines_of_code: 100,
-                    cyclomatic_complexity: 10,
-                    function_count: 5,
-                    loop_count: 3,
-                    recursion_depth: 0,
-                    memory_allocations: 5,
-                    io_operations: 5,
-                    dependencies_count: 10,
-                },
-                strategy: OptimizationStrategy::CacheOptimization,
-                speedup: 2.0,
-                success: true,
+        let source_data = vec![TrainingExample {
+            features: CodeFeatures {
+                lines_of_code: 100,
+                cyclomatic_complexity: 10,
+                function_count: 5,
+                loop_count: 3,
+                recursion_depth: 0,
+                memory_allocations: 5,
+                io_operations: 5,
+                dependencies_count: 10,
             },
-        ];
+            strategy: OptimizationStrategy::CacheOptimization,
+            speedup: 2.0,
+            success: true,
+        }];
 
         source_model.train(source_data).unwrap();
 
         let mut learner = TransferLearner::new(source_model, "new-domain".to_string());
 
-        let target_data = vec![
-            TrainingExample {
-                features: CodeFeatures {
-                    lines_of_code: 120,
-                    cyclomatic_complexity: 8,
-                    function_count: 6,
-                    loop_count: 4,
-                    recursion_depth: 0,
-                    memory_allocations: 4,
-                    io_operations: 2,
-                    dependencies_count: 8,
-                },
-                strategy: OptimizationStrategy::Parallelization,
-                speedup: 3.0,
-                success: true,
+        let target_data = vec![TrainingExample {
+            features: CodeFeatures {
+                lines_of_code: 120,
+                cyclomatic_complexity: 8,
+                function_count: 6,
+                loop_count: 4,
+                recursion_depth: 0,
+                memory_allocations: 4,
+                io_operations: 2,
+                dependencies_count: 8,
             },
-        ];
+            strategy: OptimizationStrategy::Parallelization,
+            speedup: 3.0,
+            success: true,
+        }];
 
         let result = learner.adapt(target_data);
         assert!(result.is_ok());
@@ -972,7 +990,9 @@ mod tests {
     fn test_speedup_estimation() {
         let mut optimizer = MlOptimizer::new();
 
-        optimizer.strategy_scores.insert(OptimizationStrategy::LoopUnrolling, 2.0);
+        optimizer
+            .strategy_scores
+            .insert(OptimizationStrategy::LoopUnrolling, 2.0);
 
         let features = CodeFeatures {
             lines_of_code: 50,
@@ -1005,7 +1025,8 @@ mod tests {
             dependencies_count: 5,
         };
 
-        let reasoning = optimizer.generate_reasoning(&features, OptimizationStrategy::LoopUnrolling);
+        let reasoning =
+            optimizer.generate_reasoning(&features, OptimizationStrategy::LoopUnrolling);
         assert!(!reasoning.is_empty());
     }
 
