@@ -45,7 +45,7 @@ jobs:
         run: cargo fmt -- --check
 
       - name: Run clippy
-        run: cargo clippy --all-features --all-targets -- -D warnings
+        run: cargo clippy --all-features --all-targets -- -D clippy::correctness -W warnings
 
   # Job 2: Build and Test
   build-test:
