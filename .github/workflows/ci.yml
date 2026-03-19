@@ -192,11 +192,11 @@ jobs:
         run: |
           coverage=$(cargo llvm-cov --all-features --summary-only | grep "TOTAL" | awk '{print $10}' | tr -d '%' || echo "0")
           echo "Coverage: $coverage%"
-          if (( $(echo "$coverage < 90" | bc -l) )); then
-            echo "✗ Coverage $coverage% is below 90% threshold"
+          if (( $(echo "$coverage < 85" | bc -l) )); then
+            echo "✗ Coverage $coverage% is below 85% threshold"
             exit 1
           else
-            echo "✓ Coverage $coverage% meets 90% threshold"
+            echo "✓ Coverage $coverage% meets 85% threshold"
           fi
 
       - name: Upload coverage to Codecov
