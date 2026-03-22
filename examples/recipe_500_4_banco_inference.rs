@@ -61,12 +61,10 @@
 //!
 //! | Feature | What |
 //! |---------|------|
-//! | `banco` | HTTP API + BPE tokenizer (aprender included) |
-//! | `banco,inference` | Real inference via realizar + proper BPE |
+//! | `banco` | Everything: inference + BPE + Arrow + training/merge |
 //!
-//! Without `inference`, chat returns a dry-run echo describing the routing
-//! decision. With `inference` + a loaded model, chat returns real generated text.
-//! BPE tokenizer is always available with just `banco` (aprender is included).
+//! Just `--features banco` gives you the complete workbench. Load a model
+//! for real inference; without a model, chat returns dry-run guidance.
 //!
 //! ## Checking Tokenizer Status
 //!
@@ -81,7 +79,7 @@ fn main() {
     println!("Recipe 500-4: Banco Inference");
     println!();
     println!("Build and run:");
-    println!("  cargo run --features banco,inference -- serve --banco --model ./model.gguf");
+    println!("  cargo run --features banco -- serve --banco --model ./model.gguf");
     println!();
     println!("Tokenizer search:");
     println!("  1. {{stem}}.tokenizer.json  (sibling file)");

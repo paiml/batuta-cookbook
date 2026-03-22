@@ -1,14 +1,13 @@
 //! Recipe 500-7: Banco Quickstart — Local AI Workbench in 60 Seconds
 //!
 //! ```bash
-//! # Install (banco includes BPE tokenizer, Arrow data, training/merge)
+//! # Install (batteries-included: inference, BPE, Arrow, training/merge)
 //! cargo install batuta --features banco
 //!
 //! # Start (no model — explore the API)
 //! batuta serve --banco --port 8090
 //!
-//! # Start with a model (real inference — add inference feature)
-//! cargo install batuta --features banco,inference
+//! # Start with a GGUF model (real inference)
 //! batuta serve --banco --model ./model.gguf --port 8090
 //!
 //! # Start with APR model (our native format)
