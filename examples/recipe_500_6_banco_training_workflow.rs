@@ -63,12 +63,13 @@
 //!   -d '{"messages": [{"role": "user", "content": "question"}], "rag": true}'
 //! ```
 //!
-//! ## Important: Simulated Training
+//! ## Training Loss: Real Evaluation + Simulated Decay
 //!
-//! Training metrics are currently **simulated** (cosine decay schedule,
-//! not real gradient-based loss). The response includes `"simulated": true`
-//! to honestly indicate this. Real entrenar training loop integration is
-//! a P2 work item. The API structure is complete and exercised by 38 L2 tests.
+//! When a model is loaded, the **first training metric** uses **real cross-entropy
+//! loss** computed via the model's forward pass on your training data. Remaining
+//! steps use simulated cosine decay (no weight updates yet). The response includes
+//! `"simulated": false` when real loss is computed. Full gradient-based training
+//! with weight updates is tracked in GitHub issue #59.
 //!
 //! ## Sovereign Guarantee
 //!
